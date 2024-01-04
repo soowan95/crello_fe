@@ -84,10 +84,17 @@ function WelcomePage() {
       .send(
         `${process.env.REACT_APP_EMAILJS_SERVICEID}`,
         `${process.env.REACT_APP_EMAILJS_TEMPLATEID}`,
-        { securityCode: code },
+        { securityCode: code, userEmail: firstEmail + "@" + secondEmail },
         `${process.env.REACT_APP_EMAILJS_PUBLICKEY}`,
       )
-      .then(() => setSecurityCode(code));
+      .then(() => setSecurityCode(code))
+      .catch(() => {
+        toast({
+          position: "top",
+          description: "Please input the correct email form",
+          status: "warning",
+        });
+      });
   };
 
   const handleVarify = () => {
@@ -114,7 +121,7 @@ function WelcomePage() {
               <Link to={"https://trello.com/home"}>go to Trello.</Link>
             </Badge>
           </Text>
-          {emailValidate || (
+          {!emailValidate && !securityCode && (
             <Flex mt={"30px"} alignItems={"center"}>
               <Input
                 id={"firstEmail"}
@@ -174,6 +181,13 @@ function WelcomePage() {
               </Menu>
             </Flex>
           )}
+          {securityCode && (
+            <Input
+              mt={"20px"}
+              value={firstEmail + "@" + secondEmail}
+              readOnly
+            />
+          )}
           {!securityCode && (
             <Button
               mt={"20px"}
@@ -198,9 +212,6 @@ function WelcomePage() {
             >
               Verify email
             </Button>
-          )}
-          {securityCode && emailValidate && (
-            <Input mt={"20px"} value={firstEmail + "@" + secondEmail} />
           )}
           {emailValidate && (
             <FormControl isInvalid={password !== checkPassword}>

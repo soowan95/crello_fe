@@ -160,7 +160,7 @@ function WorkSpacePage() {
             boards.map((board, idx) => (
               <Box
                 pl={3}
-                id={idx}
+                key={idx}
                 w={"20%"}
                 h={"120px"}
                 bg={"#1d285d"}
@@ -179,7 +179,7 @@ function WorkSpacePage() {
             boards.map((board, idx) => (
               <Box
                 pl={3}
-                id={idx}
+                key={idx}
                 w={"20%"}
                 h={"120px"}
                 bg={"#1d285d"}
