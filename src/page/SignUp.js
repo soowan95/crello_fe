@@ -50,6 +50,8 @@ function SignUp() {
           .then(({ data }) => {
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
+            localStorage.setItem("nickname", data.nickname);
+            localStorage.setItem("email", data.email);
             navigate("/u");
           });
       })
@@ -86,11 +88,12 @@ function SignUp() {
           />
           @
           <Input
-            if={"secondEmail"}
+            id={"secondEmail"}
             w={"50%"}
             ml={"3px"}
             placeholder={"Write your email address"}
             defaultValue={secondEmail}
+            onChange={(e) => setSecondEmail(e.target.value)}
           />
           <Menu>
             <MenuButton

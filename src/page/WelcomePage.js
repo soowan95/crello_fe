@@ -16,7 +16,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
@@ -27,6 +27,8 @@ function WelcomePage() {
   const [nickname, setNickname] = useState(null);
   const [password, setPassword] = useState(null);
   const [checkPassword, setCheckPassword] = useState(null);
+
+  const secondEmailValue = useRef(null);
 
   const toast = useToast();
 
@@ -52,6 +54,8 @@ function WelcomePage() {
           .then(({ data }) => {
             localStorage.setItem("accessToken", data.accessToken);
             localStorage.setItem("refreshToken", data.refreshToken);
+            localStorage.setItem("nickname", data.nickname);
+            localStorage.setItem("email", data.email);
             navigate("/u");
           });
       })
@@ -93,11 +97,13 @@ function WelcomePage() {
             />
             @
             <Input
-              if={"secondEmail"}
+              id={"secondEmail"}
+              ref={secondEmailValue}
               w={"50%"}
               ml={"3px"}
               placeholder={"Write your email address"}
               defaultValue={secondEmail}
+              onChange={(e) => setSecondEmail(e.target.value)}
             />
             <Menu>
               <MenuButton
@@ -111,19 +117,28 @@ function WelcomePage() {
               <MenuList>
                 <MenuItem
                   value={"gmail.com"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
+                  onClick={(e) => {
+                    setSecondEmail(e.target.value);
+                    secondEmailValue.current.value = e.target.value;
+                  }}
                 >
                   gmail.com
                 </MenuItem>
                 <MenuItem
                   value={"naver.com"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
+                  onClick={(e) => {
+                    setSecondEmail(e.target.value);
+                    secondEmailValue.current.value = e.target.value;
+                  }}
                 >
                   naver.com
                 </MenuItem>
                 <MenuItem
                   value={"hanmail.net"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
+                  onClick={(e) => {
+                    setSecondEmail(e.target.value);
+                    secondEmailValue.current.value = e.target.value;
+                  }}
                 >
                   hanmail.net
                 </MenuItem>
