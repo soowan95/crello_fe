@@ -16,10 +16,11 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import emailjs from "@emailjs/browser";
 
 function WelcomePage() {
   const [firstEmail, setFirstEmail] = useState(null);
@@ -27,6 +28,11 @@ function WelcomePage() {
   const [nickname, setNickname] = useState(null);
   const [password, setPassword] = useState(null);
   const [checkPassword, setCheckPassword] = useState(null);
+  const [emailValidate, setEmailValidate] = useState(false);
+  const [securityCode, setSecurityCode] = useState(null);
+  const [checkSecurityCode, setCheckSecurityCode] = useState(null);
+
+  const secondEmailValue = useRef(null);
 
   const toast = useToast();
 
@@ -63,6 +69,29 @@ function WelcomePage() {
       });
   };
 
+  const handleSendSecurityCode = (e) => {
+    e.preventDefault();
+
+    let code = "";
+
+    for (let i = 0; i < 6; i++) {
+      code += Math.ceil(Math.random() * 10);
+    }
+
+    emailjs
+      .send(
+        `${process.env.REACT_APP_EMAILJS_SERVICEID}`,
+        `${process.env.REACT_APP_EMAILJS_TEMPLATEID}`,
+        { securityCode: code },
+        `${process.env.REACT_APP_EMAILJS_PUBLICKEY}`,
+      )
+      .then(() => setSecurityCode(code));
+  };
+
+  const handleVarify = () => {
+    if (securityCode === checkSecurityCode) setEmailValidate(true);
+  };
+
   return (
     <Box>
       <Outlet />
@@ -83,85 +112,132 @@ function WelcomePage() {
               <Link to={"https://trello.com/home"}>go to Trello.</Link>
             </Badge>
           </Text>
-          <Flex mt={"30px"} alignItems={"center"}>
+          {emailValidate || (
+            <Flex mt={"30px"} alignItems={"center"}>
+              <Input
+                id={"firstEmail"}
+                w={"30%"}
+                mr={"3px"}
+                placeholder={"Email"}
+                onChange={(e) => setFirstEmail(e.target.value)}
+              />
+              @
+              <Input
+                if={"secondEmail"}
+                ref={secondEmailValue}
+                w={"50%"}
+                ml={"3px"}
+                placeholder={"Write your email address"}
+                defaultValue={secondEmail}
+                onChange={(e) => setSecondEmail(e.target.value)}
+              />
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  p={1}
+                  fontSize={"1rem"}
+                  rightIcon={<FontAwesomeIcon icon={faChevronDown} />}
+                >
+                  select
+                </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    value={"gmail.com"}
+                    onClick={(e) => {
+                      setSecondEmail(e.target.value);
+                      secondEmailValue.current.value = e.target.value;
+                    }}
+                  >
+                    gmail.com
+                  </MenuItem>
+                  <MenuItem
+                    value={"naver.com"}
+                    onClick={(e) => {
+                      setSecondEmail(e.target.value);
+                      secondEmailValue.current.value = e.target.value;
+                    }}
+                  >
+                    naver.com
+                  </MenuItem>
+                  <MenuItem
+                    value={"hanmail.net"}
+                    onClick={(e) => {
+                      setSecondEmail(e.target.value);
+                      secondEmailValue.current.value = e.target.value;
+                    }}
+                  >
+                    hanmail.net
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Flex>
+          )}
+          {!securityCode && (
+            <Button
+              mt={"20px"}
+              onClick={handleSendSecurityCode}
+              isDisabled={!firstEmail || !secondEmail}
+            >
+              Send securityCode
+            </Button>
+          )}
+          {securityCode && !emailValidate && (
             <Input
-              id={"firstEmail"}
-              w={"30%"}
-              mr={"3px"}
-              placeholder={"Email"}
-              onChange={(e) => setFirstEmail(e.target.value)}
+              mt={"20px"}
+              placeholder={"Input securityCode"}
+              onChange={(e) => setCheckSecurityCode(e.target.value)}
             />
-            @
+          )}
+          {securityCode && !emailValidate && (
+            <Button
+              mt={"20px"}
+              onClick={handleVarify}
+              isDisabled={!checkSecurityCode}
+            >
+              Verify email
+            </Button>
+          )}
+          {securityCode && emailValidate && (
+            <Input mt={"20px"} value={firstEmail + "@" + secondEmail} />
+          )}
+          {emailValidate && (
+            <FormControl isInvalid={password !== checkPassword}>
+              <Input
+                id={"password"}
+                mt={"15px"}
+                type={"password"}
+                placeholder={"Password"}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Input
+                id={"checkPassword"}
+                mt={"15px"}
+                type={"password"}
+                placeholder={"CheckPassword"}
+                onChange={(e) => setCheckPassword(e.target.value)}
+              />
+              <FormErrorMessage>Check your password.</FormErrorMessage>
+            </FormControl>
+          )}
+          {emailValidate && (
             <Input
-              if={"secondEmail"}
-              w={"50%"}
-              ml={"3px"}
-              placeholder={"Write your email address"}
-              defaultValue={secondEmail}
-            />
-            <Menu>
-              <MenuButton
-                as={Button}
-                p={1}
-                fontSize={"1rem"}
-                rightIcon={<FontAwesomeIcon icon={faChevronDown} />}
-              >
-                select
-              </MenuButton>
-              <MenuList>
-                <MenuItem
-                  value={"gmail.com"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
-                >
-                  gmail.com
-                </MenuItem>
-                <MenuItem
-                  value={"naver.com"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
-                >
-                  naver.com
-                </MenuItem>
-                <MenuItem
-                  value={"hanmail.net"}
-                  onClick={(e) => setSecondEmail(e.target.value)}
-                >
-                  hanmail.net
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
-          <FormControl isInvalid={password !== checkPassword}>
-            <Input
-              id={"password"}
+              id={"name"}
               mt={"15px"}
-              type={"password"}
-              placeholder={"Password"}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder={
+                firstEmail ? "Nickname ( " + firstEmail + " )" : "Nickname"
+              }
+              onChange={(e) => setNickname(e.target.value)}
             />
-            <Input
-              id={"checkPassword"}
-              mt={"15px"}
-              type={"password"}
-              placeholder={"CheckPassword"}
-              onChange={(e) => setCheckPassword(e.target.value)}
-            />
-            <FormErrorMessage>Check your password.</FormErrorMessage>
-          </FormControl>
-          <Input
-            id={"name"}
-            mt={"15px"}
-            placeholder={
-              firstEmail ? "Nickname ( " + firstEmail + " )" : "Nickname"
-            }
-            onChange={(e) => setNickname(e.target.value)}
-          />
-          <Button
-            mt={"20px"}
-            onClick={handleSubmit}
-            isDisabled={!password || password !== checkPassword}
-          >
-            Sign-up for Free
-          </Button>
+          )}
+          {emailValidate && (
+            <Button
+              mt={"20px"}
+              onClick={handleSubmit}
+              isDisabled={!password || password !== checkPassword}
+            >
+              Sign-up for Free
+            </Button>
+          )}
         </Box>
         <Box w={"450px"} h={"100%"}>
           <Image
