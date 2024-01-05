@@ -19,6 +19,7 @@ import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
+import List from "./List";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -31,12 +32,13 @@ function WorkSpacePage() {
 
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) navigate("/login");
+    else navigate("/u/board");
   }, [navigate]);
 
   useEffect(() => {
     handleBoards();
     handleRecentBoeard();
-  }, [boards.length, navigate]);
+  }, [boards.length, navigate, location]);
 
   const handleRecentBoeard = () => {
     axios
@@ -80,7 +82,7 @@ function WorkSpacePage() {
   };
 
   return (
-    <Box>
+    <Box position={"relative"}>
       <Flex
         w={{ lg: "100%", xl: "70%" }}
         h={"40px"}
@@ -88,6 +90,9 @@ function WorkSpacePage() {
         borderBottom={"1px solid white"}
         alignItems={"center"}
         justifyContent={"space-between"}
+        position={"fixed"}
+        top={0}
+        left={{ lg: "0", xl: "15%" }}
       >
         <Box
           h={"100%"}
@@ -100,53 +105,54 @@ function WorkSpacePage() {
         >
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
-
-        <Popover placement={"bottom-start"}>
-          <PopoverTrigger>
-            <Button mr={"75%"} w={"8%"} size={"sm"}>
-              Create
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <Box m={"5px auto"}>Create board</Box>
-            <PopoverCloseButton />
-            <FormControl isInvalid={!boardTitle}>
-              <FormLabel fontSize={"0.8rem"} ml={4}>
-                Board Title
-              </FormLabel>
-              <Input
+        {location.pathname === "/u/board" && (
+          <Popover placement={"bottom-start"}>
+            <PopoverTrigger>
+              <Button mr={"75%"} w={"8%"} size={"sm"}>
+                Create
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <Box m={"5px auto"}>Create board</Box>
+              <PopoverCloseButton />
+              <FormControl isInvalid={!boardTitle}>
+                <FormLabel fontSize={"0.8rem"} ml={4}>
+                  Board Title
+                </FormLabel>
+                <Input
+                  w={"90%"}
+                  ml={4}
+                  onChange={(e) => setBoardTitle(e.target.value)}
+                />
+                <FormErrorMessage ml={4}>
+                  * Board title is required
+                </FormErrorMessage>
+              </FormControl>
+              <Button
                 w={"90%"}
-                ml={4}
-                onChange={(e) => setBoardTitle(e.target.value)}
-              />
-              <FormErrorMessage ml={4}>
-                * Board title is required
-              </FormErrorMessage>
-            </FormControl>
-            <Button
-              w={"90%"}
-              m={"10px auto"}
-              isDisabled={!boardTitle}
-              onClick={handleCreate}
-            >
-              Create
-            </Button>
-          </PopoverContent>
-        </Popover>
-
+                m={"10px auto"}
+                isDisabled={!boardTitle}
+                onClick={handleCreate}
+              >
+                Create
+              </Button>
+            </PopoverContent>
+          </Popover>
+        )}
         <Popover placement={"bottom"}>
           <PopoverTrigger>
             <Center>
-              <Avatar size={"sm"} name={"k"} />
+              <Avatar
+                mr={"10px"}
+                size={"sm"}
+                name={localStorage.getItem("nickname")}
+              />
             </Center>
           </PopoverTrigger>
           <PopoverContent w={"100px"}>
             <Button
               onClick={() => {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-                localStorage.removeItem("nickname");
-                localStorage.removeItem("email");
+                localStorage.clear();
                 navigate("/");
               }}
             >
@@ -158,6 +164,7 @@ function WorkSpacePage() {
       {location.pathname === "/u/board" && (
         <Board boards={boards} recentBoard={recentBoard} />
       )}
+      {location.pathname === "/u/list" && <List boards={boards} />}
     </Box>
   );
 }

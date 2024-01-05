@@ -39,7 +39,7 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) navigate("/u");
+    if (localStorage.getItem("accessToken")) navigate("/u/board");
   }, [navigate]);
 
   const handleSubmit = () => {

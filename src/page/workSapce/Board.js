@@ -2,9 +2,12 @@ import { Box, Flex, Heading } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Board({ boards, recentBoard }) {
-  const handleBoard = (id) => {
+  const navigate = useNavigate();
+
+  const handleBoard = (id, title) => {
     axios
       .put(
         "/api/v1/board/updateRecent",
@@ -17,7 +20,11 @@ function Board({ boards, recentBoard }) {
           },
         },
       )
-      .then(() => console.log("ok"));
+      .then(() => {
+        localStorage.setItem("boardId", id);
+        localStorage.setItem("boardTitle", title);
+        navigate("/u/list");
+      });
   };
 
   return (
@@ -29,13 +36,13 @@ function Board({ boards, recentBoard }) {
         <Box
           mt={"20px"}
           pl={3}
-          w={"20%"}
+          w={"230px"}
           h={"200px"}
           bg={"#1d285d"}
           borderRadius={"10px"}
           lineHeight={"40px"}
           fontSize={"1.2rem"}
-          onClick={() => handleBoard(recentBoard.id)}
+          onClick={() => handleBoard(recentBoard.id, recentBoard.title)}
         >
           {recentBoard !== null && recentBoard.title}
         </Box>
@@ -48,13 +55,13 @@ function Board({ boards, recentBoard }) {
               <Box
                 pl={3}
                 key={idx}
-                w={"20%"}
+                w={"230px"}
                 h={"100%"}
                 bg={"#1d285d"}
                 borderRadius={"10px"}
                 lineHeight={"40px"}
                 fontSize={"1.2rem"}
-                onClick={() => handleBoard(board.id)}
+                onClick={() => handleBoard(board.id, board.title)}
               >
                 {board !== null && board.title}
               </Box>
