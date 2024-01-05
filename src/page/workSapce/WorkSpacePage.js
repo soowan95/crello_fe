@@ -36,8 +36,10 @@ function WorkSpacePage() {
   }, [navigate]);
 
   useEffect(() => {
-    handleBoards();
-    handleRecentBoeard();
+    if (localStorage.getItem("accessToken")) {
+      handleBoards();
+      handleRecentBoeard();
+    }
   }, [boards.length, navigate, location]);
 
   const handleRecentBoeard = () => {
