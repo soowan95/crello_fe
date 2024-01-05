@@ -30,7 +30,9 @@ function LoginPage() {
       .then(({ data }) => {
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
-        navigate("/u");
+        localStorage.setItem("nickname", data.nickname);
+        localStorage.setItem("email", data.email);
+        navigate("/u/boardList");
       })
       .catch((err) => {
         if (err.response.status === 401) {
