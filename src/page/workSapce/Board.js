@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import axios from "axios";
 
-function BoardList({ boards, recentBoard }) {
+function Board({ boards, recentBoard }) {
   const handleBoard = (id) => {
     axios
       .put(
@@ -65,4 +65,4 @@ function BoardList({ boards, recentBoard }) {
   );
 }
 
-export default BoardList;
+export default Board;

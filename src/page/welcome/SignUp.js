@@ -58,7 +58,7 @@ function SignUp() {
             localStorage.setItem("refreshToken", data.refreshToken);
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
-            navigate("/u/boardList");
+            navigate("/u/board");
           });
       })
       .catch((err) => {

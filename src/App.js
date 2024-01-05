@@ -9,7 +9,7 @@ import Navbar from "./component/Navbar";
 import LoginPage from "./page/welcome/LoginPage";
 import SignUp from "./page/welcome/SignUp";
 import WorkSpacePage from "./page/workSapce/WorkSpacePage";
-import BoardList from "./page/workSapce/BoardList";
+import Board from "./page/workSapce/Board";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -20,7 +20,7 @@ const routes = createBrowserRouter(
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignUp />} />
       <Route path="u" element={<WorkSpacePage />}>
-        <Route path="boardList" element={<BoardList />} />
+        <Route path="board" element={<Board />} />
       </Route>
     </Route>,
   ),

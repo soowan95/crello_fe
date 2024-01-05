@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
-import BoardList from "./BoardList";
+import Board from "./Board";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -96,7 +96,7 @@ function WorkSpacePage() {
           fontSize={"1.2rem"}
           textAlign={"center"}
           lineHeight={"40px"}
-          onClick={() => navigate("/u/boardList")}
+          onClick={() => navigate("/u/board")}
         >
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
@@ -155,8 +155,8 @@ function WorkSpacePage() {
           </PopoverContent>
         </Popover>
       </Flex>
-      {location.pathname === "/u/boardList" && (
-        <BoardList boards={boards} recentBoard={recentBoard} />
+      {location.pathname === "/u/board" && (
+        <Board boards={boards} recentBoard={recentBoard} />
       )}
     </Box>
   );
