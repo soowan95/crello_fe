@@ -11,6 +11,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Spinner,
   useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -58,7 +59,7 @@ function SignUp() {
             localStorage.setItem("refreshToken", data.refreshToken);
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
-            navigate("/u");
+            navigate("/u/boardList");
           });
       })
       .catch((err) => {
@@ -78,19 +79,29 @@ function SignUp() {
       code += Math.ceil(Math.random() * 10);
     }
 
-    emailjs
-      .send(
-        `${process.env.REACT_APP_EMAILJS_SERVICEID}`,
-        `${process.env.REACT_APP_EMAILJS_TEMPLATEID}`,
-        { securityCode: code, userEmail: firstEmail + "@" + secondEmail },
-        `${process.env.REACT_APP_EMAILJS_PUBLICKEY}`,
-      )
-      .then(() => setSecurityCode(code))
-      .catch(() => {
+    axios
+      .get("/api/v1/user/check?email=" + firstEmail + "@" + secondEmail)
+      .then(() => {
+        emailjs
+          .send(
+            `${process.env.REACT_APP_EMAILJS_SERVICEID}`,
+            `${process.env.REACT_APP_EMAILJS_TEMPLATEID}`,
+            { securityCode: code, userEmail: firstEmail + "@" + secondEmail },
+            `${process.env.REACT_APP_EMAILJS_PUBLICKEY}`,
+          )
+          .then(() => setSecurityCode(code))
+          .catch(() => {
+            toast({
+              position: "top",
+              description: "Please input the correct email form",
+              status: "warning",
+            });
+          });
+      })
+      .catch((err) => {
         toast({
-          position: "top",
-          description: "Please input the correct email form",
-          status: "warning",
+          description: err.response.data.msg,
+          status: "error",
         });
       });
   };

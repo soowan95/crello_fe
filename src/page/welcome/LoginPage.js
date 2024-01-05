@@ -32,7 +32,7 @@ function LoginPage() {
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("nickname", data.nickname);
         localStorage.setItem("email", data.email);
-        navigate("/u");
+        navigate("/u/boardList");
       })
       .catch((err) => {
         if (err.response.status === 401) {

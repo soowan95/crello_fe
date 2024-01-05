@@ -7,19 +7,18 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
   Input,
   Popover,
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
-import { faClock } from "@fortawesome/free-regular-svg-icons";
+import BoardList from "./BoardList";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -27,6 +26,8 @@ function WorkSpacePage() {
   const [recentBoard, setRecentBoard] = useState(null);
 
   const navigate = useNavigate();
+
+  const location = useLocation();
 
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) navigate("/login");
@@ -151,46 +152,7 @@ function WorkSpacePage() {
           </PopoverContent>
         </Popover>
       </Flex>
-      <Box w={"90%"} h={"150px"} m={"50px auto"}>
-        <Box h={"30px"}>
-          <FontAwesomeIcon icon={faClock} /> Recently worked
-        </Box>
-        <Flex w={"100%"} h={"120px"}>
-          {boards.length !== 0 &&
-            boards.map((board, idx) => (
-              <Box
-                pl={3}
-                key={idx}
-                w={"20%"}
-                h={"120px"}
-                bg={"#1d285d"}
-                borderRadius={"10px"}
-                lineHeight={"40px"}
-              >
-                board
-              </Box>
-            ))}
-        </Flex>
-      </Box>
-      <Box w={"90%"} h={"200px"} m={"80px auto"}>
-        <Heading h={"80px"}>Your Workspaces</Heading>
-        <Flex w={"100%"} h={"120px"} gap={"6%"}>
-          {boards.length !== 0 &&
-            boards.map((board, idx) => (
-              <Box
-                pl={3}
-                key={idx}
-                w={"20%"}
-                h={"120px"}
-                bg={"#1d285d"}
-                borderRadius={"10px"}
-                lineHeight={"40px"}
-              >
-                board
-              </Box>
-            ))}
-        </Flex>
-      </Box>
+      {location.pathname === "/u/boardList" && <BoardList boards={boards} />}
     </Box>
   );
 }
