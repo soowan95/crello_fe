@@ -35,14 +35,17 @@ function WorkSpacePage() {
 
   useEffect(() => {
     handleBoards();
+    handleRecentBoeard();
   }, [boards.length, navigate]);
 
   const handleRecentBoeard = () => {
-    axios.get("/api/v1/board/recent?email=" + localStorage.getItem("email"), {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-    });
+    axios
+      .get("/api/v1/board/recent?email=" + localStorage.getItem("email"), {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      })
+      .then(({ data }) => setRecentBoard(data));
   };
 
   const handleBoards = () => {
@@ -52,7 +55,7 @@ function WorkSpacePage() {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
       })
-      .then(({ data }) => setBoards(data.title))
+      .then(({ data }) => setBoards(data))
       .catch((err) => {
         if (err.response.status === 401) navigate("/login");
       });
@@ -93,7 +96,7 @@ function WorkSpacePage() {
           fontSize={"1.2rem"}
           textAlign={"center"}
           lineHeight={"40px"}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/u/boardList")}
         >
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
@@ -152,7 +155,9 @@ function WorkSpacePage() {
           </PopoverContent>
         </Popover>
       </Flex>
-      {location.pathname === "/u/boardList" && <BoardList boards={boards} />}
+      {location.pathname === "/u/boardList" && (
+        <BoardList boards={boards} recentBoard={recentBoard} />
+      )}
     </Box>
   );
 }
