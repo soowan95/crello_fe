@@ -39,7 +39,7 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) navigate("/u");
+    if (localStorage.getItem("accessToken")) navigate("/u/board");
   }, [navigate]);
 
   const handleSubmit = () => {
@@ -60,7 +60,7 @@ function WelcomePage() {
             localStorage.setItem("refreshToken", data.refreshToken);
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
-            navigate("/u/boardList");
+            navigate("/u/board");
           });
       })
       .catch((err) => {
