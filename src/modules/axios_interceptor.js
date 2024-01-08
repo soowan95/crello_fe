@@ -23,27 +23,29 @@ instance.interceptors.response.use(
     const { response, config } = error;
 
     if (response.status === 401 && response.data.msg === "만료된 JWT 토큰") {
-      const { data } = await axios.post(
-        "/api/v1/auth/refresh",
-        {
-          email: localStorage.getItem("email"),
-          refreshToken: localStorage.getItem("refreshToken"),
-        },
-        {
-          baseURL: "http://localhost:8080",
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("refreshToken"),
+      try {
+        const { data } = await axios.post(
+          "/api/v1/auth/refresh",
+          {
+            email: localStorage.getItem("email"),
+            refreshToken: localStorage.getItem("refreshToken"),
           },
-        },
-      );
+          {
+            baseURL: "http://localhost:8080",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("refreshToken"),
+            },
+          },
+        );
 
-      const { accessToken } = data;
-      localStorage.setItem("accessToken", accessToken);
-      config.headers.Authorization = "Bearer " + accessToken;
-      return await axios(config).catch(() => {
+        const { accessToken } = data;
+        localStorage.setItem("accessToken", accessToken);
+        config.headers.Authorization = "Bearer " + accessToken;
+        return axios(config);
+      } catch (refreshError) {
+        window.location.href = "/login";
         localStorage.clear();
-        window.location.href("/login");
-      });
+      }
     }
     return Promise.reject(error);
   },

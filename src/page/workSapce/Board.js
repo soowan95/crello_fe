@@ -3,29 +3,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { instance } from "../../modules/axios_interceptor";
 
 function Board({ boards, recentBoard }) {
   const navigate = useNavigate();
 
   const handleBoard = (id, title) => {
-    axios
-      .put(
-        "/api/v1/board/updateRecent",
-        {
-          id,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
+    instance
+      .put("/api/v1/board/updateRecent", {
+        id,
+      })
       .then(() => {
         localStorage.setItem("boardId", id);
         localStorage.setItem("boardTitle", title);
         navigate("/u/list");
-      })
-      .catch(() => navigate("/login"));
+      });
   };
 
   return (

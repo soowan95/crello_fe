@@ -31,38 +31,24 @@ function WorkSpacePage() {
 
   const location = useLocation();
 
-  // useEffect(() => {
-  //   if (!localStorage.getItem("accessToken")) navigate("/login");
-  // }, [navigate]);
-
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
+    if (!localStorage.getItem("accessToken")) navigate("/login");
+    else if (location.pathname === "/u/board") {
       handleBoards();
       handleRecentBoeard();
     }
   }, [location]);
 
   const handleRecentBoeard = () => {
-    axios
-      .get("/api/v1/board/recent?email=" + localStorage.getItem("email"), {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
+    instance
+      .get("/api/v1/board/recent?email=" + localStorage.getItem("email"))
       .then(({ data }) => setRecentBoard(data));
   };
 
   const handleBoards = () => {
-    axios
-      .get("/api/v1/board/all?email=" + localStorage.getItem("email"), {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
-      .then(({ data }) => setBoards(data))
-      .catch((err) => {
-        if (err.response.status === 401) navigate("/login");
-      });
+    instance
+      .get("/api/v1/board/all?email=" + localStorage.getItem("email"))
+      .then(({ data }) => setBoards(data));
   };
 
   const handleCreate = () => {

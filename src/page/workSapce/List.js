@@ -26,6 +26,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListTitleComp from "../../component/ListTitleComp";
+import { instance } from "../../modules/axios_interceptor";
 
 function List({ boards }) {
   const [boardTitle, setBoardTitle] = useState(
@@ -43,104 +44,52 @@ function List({ boards }) {
   const toast = useToast();
 
   useEffect(() => {
-    axios
+    instance
       .get("/api/v1/list/all?boardId=" + localStorage.getItem("boardId"), {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
       })
-      .then(({ data }) => setLists(data))
-      .catch((err) => {
-        toast({
-          description: err.response.data.msg,
-          status: "error",
-        });
-      });
-  }, [lists.length]);
+      .then(({ data }) => setLists(data));
+  }, []);
 
   const handleTitle = (title) => {
     localStorage.setItem("boardTitle", title);
-    axios
-      .put(
-        "/api/v1/board/update",
-        {
-          title: title,
-          id: localStorage.getItem("boardId"),
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
-      .then(({ data }) => setLists(data))
-      .catch((err) => {
-        toast({
-          description: err.response.data.msg,
-          status: "error",
-        });
-      });
+    instance
+      .put("/api/v1/board/update", {
+        title: title,
+        id: localStorage.getItem("boardId"),
+      })
+      .then(({ data }) => setLists(data));
   };
 
   const handleList = () => {
-    axios
-      .post(
-        "/api/v1/list/add",
-        {
-          boardId: localStorage.getItem("boardId"),
-          title: listTitle,
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
+    instance
+      .post("/api/v1/list/add", {
+        boardId: localStorage.getItem("boardId"),
+        title: listTitle,
+      })
       .then(({ data }) => {
         setLists(data);
         setListTitle(null);
         addList.current.value = null;
-      })
-      .catch((err) => {
-        toast({
-          description: err.response.data.msg,
-          status: "error",
-        });
       });
   };
 
   const handleDeleteList = (id) => {
-    axios
-      .delete("/api/v1/list/delete?id=" + id, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
+    instance
+      .delete("/api/v1/list/delete?id=" + id)
       .then(() => setLists((lists) => lists.filter((i) => i.id !== id)));
   };
 
   const handleMoveList = (id) => {
-    axios
-      .put(
-        "/api/v1/list/move",
-        {
-          id: id,
-          nextId: moveBoardId,
-          prevId: localStorage.getItem("boardId"),
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
-      .then(({ data }) => setLists(data))
-      .catch((err) => {
-        toast({
-          description: err.response.data.msg,
-          status: "error",
-        });
-      });
+    instance
+      .put("/api/v1/list/move", {
+        id: id,
+        nextId: moveBoardId,
+        prevId: localStorage.getItem("boardId"),
+      })
+      .then(({ data }) => setLists(data));
   };
 
   return (
