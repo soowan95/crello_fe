@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
 import List from "./List";
+import { instance } from "../../modules/axios_interceptor";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -30,17 +31,16 @@ function WorkSpacePage() {
 
   const location = useLocation();
 
-  useEffect(() => {
-    if (!localStorage.getItem("accessToken")) navigate("/login");
-    else navigate("/u/board");
-  }, [navigate]);
+  // useEffect(() => {
+  //   if (!localStorage.getItem("accessToken")) navigate("/login");
+  // }, [navigate]);
 
   useEffect(() => {
     if (localStorage.getItem("accessToken")) {
       handleBoards();
       handleRecentBoeard();
     }
-  }, [boards.length, navigate, location]);
+  }, [location]);
 
   const handleRecentBoeard = () => {
     axios
@@ -66,21 +66,12 @@ function WorkSpacePage() {
   };
 
   const handleCreate = () => {
-    axios
-      .post(
-        "/api/v1/board/create",
-        {
-          title: boardTitle,
-          email: localStorage.getItem("email"),
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
-      .then(() => handleBoards())
-      .catch(() => navigate("/login"));
+    instance
+      .post("/api/v1/board/create", {
+        title: boardTitle,
+        email: localStorage.getItem("email"),
+      })
+      .then(() => handleBoards());
   };
 
   return (

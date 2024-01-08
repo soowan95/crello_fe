@@ -24,7 +24,8 @@ function Board({ boards, recentBoard }) {
         localStorage.setItem("boardId", id);
         localStorage.setItem("boardTitle", title);
         navigate("/u/list");
-      });
+      })
+      .catch(() => navigate("/login"));
   };
 
   return (
