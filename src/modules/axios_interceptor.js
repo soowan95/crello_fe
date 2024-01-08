@@ -43,6 +43,7 @@ instance.interceptors.response.use(
         config.headers.Authorization = "Bearer " + accessToken;
         return axios(config);
       } catch (refreshError) {
+        await axios.post("/logout", { email: localStorage.getItem("email") });
         window.location.href = "/login";
         localStorage.clear();
       }

@@ -60,6 +60,15 @@ function WorkSpacePage() {
       .then(() => handleBoards());
   };
 
+  const handleLogout = () => {
+    instance
+      .post("/logout", { email: localStorage.getItem("email") })
+      .then(() => {
+        localStorage.clear();
+        navigate("/");
+      });
+  };
+
   return (
     <Box position={"relative"}>
       <Flex
@@ -129,14 +138,7 @@ function WorkSpacePage() {
             </Center>
           </PopoverTrigger>
           <PopoverContent w={"100px"}>
-            <Button
-              onClick={() => {
-                localStorage.clear();
-                navigate("/");
-              }}
-            >
-              logout
-            </Button>
+            <Button onClick={handleLogout}>logout</Button>
           </PopoverContent>
         </Popover>
       </Flex>
