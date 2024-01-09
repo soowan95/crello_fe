@@ -1,10 +1,14 @@
 import {
   Box,
   Button,
+  Center,
   Editable,
   EditableInput,
   EditablePreview,
   Flex,
+  FormControl,
+  FormErrorIcon,
+  FormErrorMessage,
   Input,
   Popover,
   PopoverCloseButton,
@@ -14,19 +18,19 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import {
   faChevronLeft,
   faEllipsis,
   faPlus,
+  faTrash,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListTitleComp from "../../component/ListTitleComp";
 import { instance } from "../../modules/axios_interceptor";
+import { useNavigate } from "react-router-dom";
 
 function List({ boards }) {
   const [boardTitle, setBoardTitle] = useState(
@@ -38,10 +42,12 @@ function List({ boards }) {
   const [lists, setLists] = useState([]);
   const [moveBoard, setMoveBoard] = useState(boardTitle);
   const [moveBoardId, setMoveBoardId] = useState(null);
+  const [checkBoardTitle, setCheckBoardTitle] = useState(null);
 
   const addList = useRef(null);
+  const checkBoard = useRef(null);
 
-  const toast = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     instance
@@ -55,12 +61,10 @@ function List({ boards }) {
 
   const handleTitle = (title) => {
     localStorage.setItem("boardTitle", title);
-    instance
-      .put("/api/v1/board/update", {
-        title: title,
-        id: localStorage.getItem("boardId"),
-      })
-      .then(({ data }) => setLists(data));
+    instance.put("/api/v1/board/update", {
+      title: title,
+      id: localStorage.getItem("boardId"),
+    });
   };
 
   const handleList = () => {
@@ -92,30 +96,84 @@ function List({ boards }) {
       .then(({ data }) => setLists(data));
   };
 
+  const handleDeleteBoard = () => {
+    instance
+      .delete("/api/v1/board/delete?id=" + localStorage.getItem("boardId"))
+      .then(() => {
+        localStorage.removeItem("boardId");
+        localStorage.removeItem("boardTitle");
+        navigate("/u/board");
+      });
+  };
+
   return (
     <Box>
       <Box m={"80px auto"} position={"absolute"}>
-        <Editable
-          w={"fit-content"}
-          h={"50px"}
-          fontSize={"1.5rem"}
-          value={boardTitle}
-          _hover={{ bg: "rgba(68,66,66,0.47)" }}
-          borderRadius={"10px"}
-          onChange={(e) => {
-            setBoardTitle(e);
-          }}
-          onSubmit={(e) => {
-            if (e === "") setBoardTitle(localStorage.getItem("boardTitle"));
-            else if (boardTitle !== localStorage.getItem("boardTitle"))
-              handleTitle(boardTitle);
-          }}
-          position={"relative"}
-          left={"50px"}
-        >
-          <EditablePreview />
-          <EditableInput />
-        </Editable>
+        <Flex alignItems={"center"}>
+          <Editable
+            w={"fit-content"}
+            h={"50px"}
+            fontSize={"1.5rem"}
+            value={boardTitle}
+            _hover={{ bg: "rgba(68,66,66,0.47)" }}
+            borderRadius={"10px"}
+            onChange={(e) => {
+              setBoardTitle(e);
+            }}
+            onSubmit={(e) => {
+              if (e === "") setBoardTitle(localStorage.getItem("boardTitle"));
+              else if (boardTitle !== localStorage.getItem("boardTitle"))
+                handleTitle(boardTitle);
+            }}
+            position={"relative"}
+            left={"50px"}
+          >
+            <EditablePreview />
+            <EditableInput />
+          </Editable>
+          <Popover
+            placement={"right-start"}
+            onClose={() => {
+              setCheckBoardTitle(null);
+              checkBoard.current.value = null;
+            }}
+          >
+            <PopoverTrigger>
+              <Box ml={"60px"} _hover={{ color: "red" }} cursor={"pointer"}>
+                <FontAwesomeIcon icon={faTrash} />
+              </Box>
+            </PopoverTrigger>
+            <PopoverContent w={"250px"}>
+              <FormControl
+                isInvalid={
+                  checkBoardTitle !== localStorage.getItem("boardTitle")
+                }
+              >
+                <Input
+                  w={"90%"}
+                  m={"10px 5%"}
+                  ref={checkBoard}
+                  placeholder={localStorage.getItem("boardTitle")}
+                  onChange={(e) => setCheckBoardTitle(e.target.value)}
+                />
+                <FormErrorMessage ml={"5%"}>
+                  * Input board title to delete board
+                </FormErrorMessage>
+                <Button
+                  size={"sm"}
+                  ml={"170px"}
+                  my={"10px"}
+                  isDisabled={
+                    checkBoardTitle !== localStorage.getItem("boardTitle")
+                  }
+                  onClick={handleDeleteBoard}
+                >
+                  Delete
+                </Button>
+              </FormControl>
+            </PopoverContent>
+          </Popover>
+        </Flex>
         <Flex
           w={"fit-content"}
           m={"0 auto"}
@@ -126,136 +184,142 @@ function List({ boards }) {
         >
           {lists.length !== 0 &&
             lists.map((list) => (
-              <Box
+              <Center
                 w={"220px"}
-                h={"100%"}
                 key={list.id}
-                bg={"white"}
-                color={"black"}
-                borderRadius={"10px"}
+                bg={
+                  boards
+                    .filter((b) => b.id - localStorage.getItem("boardId") === 0)
+                    .at(0).color
+                }
+                borderRadius={"15px"}
               >
-                <Flex
-                  h={"40px"}
+                <Box
                   w={"90%"}
-                  m={"5px auto"}
-                  justifyContent={"space-between"}
+                  bg={"rgba(255,255,255,0.24)"}
+                  my={"10px"}
+                  borderRadius={"10px"}
                 >
-                  <ListTitleComp title={list.title} id={list.id} />
-                  <Popover
-                    placement={"bottom-start"}
-                    onClose={() => setIsMovingList(false)}
+                  <Flex
+                    h={"40px"}
+                    w={"90%"}
+                    m={"5px auto"}
+                    justifyContent={"space-between"}
                   >
-                    <PopoverTrigger>
-                      <Button
-                        size={"sm"}
-                        _hover={{ bg: "#ccc" }}
-                        color={"black"}
-                      >
-                        <FontAwesomeIcon icon={faEllipsis} />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      bg={"#e8e8e8"}
-                      w={"200px"}
-                      boxShadow={"5px 4px 6px rgba(40, 40, 40, 0.7)"}
+                    <ListTitleComp title={list.title} id={list.id} />
+                    <Popover
+                      placement={"bottom-start"}
+                      onClose={() => setIsMovingList(false)}
                     >
-                      <PopoverHeader textAlign={"center"}>
+                      <PopoverTrigger>
+                        <Box mt={"5px"} mr={"5px"} cursor={"pointer"}>
+                          <FontAwesomeIcon icon={faEllipsis} />
+                        </Box>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        color={"black"}
+                        bg={"#e8e8e8"}
+                        w={"200px"}
+                        boxShadow={"5px 4px 6px rgba(40, 40, 40, 0.7)"}
+                      >
+                        <PopoverHeader textAlign={"center"}>
+                          {!isMovingList && (
+                            <Box fontWeight={"bold"}>List actions</Box>
+                          )}
+                          {isMovingList && (
+                            <Flex w={"70%"} justifyContent={"space-between"}>
+                              <Box
+                                fontSize={"0.8rem"}
+                                mt={"-1px"}
+                                cursor={"pointer"}
+                                onClick={() => setIsMovingList(false)}
+                              >
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                              </Box>
+                              <Box fontWeight={"bold"}>Move list</Box>
+                            </Flex>
+                          )}
+                        </PopoverHeader>
+                        <PopoverCloseButton />
                         {!isMovingList && (
-                          <Box fontWeight={"bold"}>List actions</Box>
+                          <Box>
+                            <Box ml={"10px"} my={"20px"} cursor={"pointer"}>
+                              Add card
+                            </Box>
+                            <Box
+                              ml={"10px"}
+                              my={"20px"}
+                              cursor={"pointer"}
+                              onClick={() => setIsMovingList(true)}
+                            >
+                              Move list
+                            </Box>
+                            <Box
+                              ml={"10px"}
+                              my={"20px"}
+                              cursor={"pointer"}
+                              onClick={() => handleDeleteList(list.id)}
+                            >
+                              Delete List
+                            </Box>
+                          </Box>
                         )}
                         {isMovingList && (
-                          <Flex w={"70%"} justifyContent={"space-between"}>
-                            <Box
-                              fontSize={"0.8rem"}
-                              mt={"-1px"}
-                              cursor={"pointer"}
-                              onClick={() => setIsMovingList(false)}
-                            >
-                              <FontAwesomeIcon icon={faChevronLeft} />
+                          <Box
+                            w={"90%"}
+                            m={"10px 5%"}
+                            cursor={"pointer"}
+                            borderBottom={"1px solid white"}
+                            borderRadius={"8px"}
+                          >
+                            <Box ml={"10px"} mb={"10px"} fontSize={"0.7rem"}>
+                              board
                             </Box>
-                            <Box fontWeight={"bold"}>Move list</Box>
-                          </Flex>
+                            <RadioGroup
+                              onChange={(e) => {
+                                setMoveBoard(
+                                  boards.filter((b) => b.id - e === 0).at(0)
+                                    .title,
+                                );
+                                setMoveBoardId(e);
+                              }}
+                            >
+                              <Stack spacing={5}>
+                                {boards.length !== 0 &&
+                                  boards.map((board) => (
+                                    <Radio key={board.id} value={board.id}>
+                                      {board.title === boardTitle
+                                        ? board.title + " (current)"
+                                        : board.title}
+                                    </Radio>
+                                  ))}
+                              </Stack>
+                            </RadioGroup>
+                            <Button
+                              mt={"20px"}
+                              size={"sm"}
+                              colorScheme={"blue"}
+                              isDisabled={moveBoard === boardTitle}
+                              onClick={() => handleMoveList(list.id)}
+                            >
+                              Move
+                            </Button>
+                          </Box>
                         )}
-                      </PopoverHeader>
-                      <PopoverCloseButton />
-                      {!isMovingList && (
-                        <Box>
-                          <Box ml={"10px"} my={"20px"} cursor={"pointer"}>
-                            Add card
-                          </Box>
-                          <Box
-                            ml={"10px"}
-                            my={"20px"}
-                            cursor={"pointer"}
-                            onClick={() => setIsMovingList(true)}
-                          >
-                            Move list
-                          </Box>
-                          <Box
-                            ml={"10px"}
-                            my={"20px"}
-                            cursor={"pointer"}
-                            onClick={() => handleDeleteList(list.id)}
-                          >
-                            Delete List
-                          </Box>
-                        </Box>
-                      )}
-                      {isMovingList && (
-                        <Box
-                          w={"90%"}
-                          m={"10px 5%"}
-                          cursor={"pointer"}
-                          borderBottom={"1px solid white"}
-                          borderRadius={"8px"}
-                        >
-                          <Box ml={"10px"} mb={"10px"} fontSize={"0.7rem"}>
-                            board
-                          </Box>
-                          <RadioGroup
-                            onChange={(e) => {
-                              setMoveBoard(
-                                boards.filter((b) => b.id - e === 0).at(0)
-                                  .title,
-                              );
-                              setMoveBoardId(e);
-                            }}
-                          >
-                            <Stack spacing={5}>
-                              {boards.length !== 0 &&
-                                boards.map((board) => (
-                                  <Radio key={board.id} value={board.id}>
-                                    {board.title === boardTitle
-                                      ? board.title + " (current)"
-                                      : board.title}
-                                  </Radio>
-                                ))}
-                            </Stack>
-                          </RadioGroup>
-                          <Button
-                            mt={"20px"}
-                            size={"sm"}
-                            colorScheme={"blue"}
-                            isDisabled={moveBoard === boardTitle}
-                            onClick={() => handleMoveList(list.id)}
-                          >
-                            Move
-                          </Button>
-                        </Box>
-                      )}
-                    </PopoverContent>
-                  </Popover>
-                </Flex>
-                <Button
-                  w={"90%"}
-                  m={"5px 5%"}
-                  _hover={{ bg: "#ccc" }}
-                  color={"black"}
-                >
-                  <FontAwesomeIcon icon={faPlus} />{" "}
-                  <span style={{ marginLeft: "10px" }}>Add a card</span>
-                </Button>
-              </Box>
+                      </PopoverContent>
+                    </Popover>
+                  </Flex>
+                  <Box
+                    w={"90%"}
+                    m={"10px auto"}
+                    color={"black"}
+                    textAlign={"center"}
+                  >
+                    <FontAwesomeIcon icon={faPlus} />{" "}
+                    <span style={{ marginLeft: "10px" }}>Add a card</span>
+                  </Box>
+                </Box>
+              </Center>
             ))}
           {!isAddingList && (
             <Button
