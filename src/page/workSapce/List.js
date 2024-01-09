@@ -7,7 +7,6 @@ import {
   EditablePreview,
   Flex,
   FormControl,
-  FormErrorIcon,
   FormErrorMessage,
   Input,
   Popover,
@@ -102,6 +101,7 @@ function List({ boards }) {
       .then(() => {
         localStorage.removeItem("boardId");
         localStorage.removeItem("boardTitle");
+        localStorage.removeItem("boardColor");
         navigate("/u/board");
       });
   };
@@ -153,7 +153,7 @@ function List({ boards }) {
                   w={"90%"}
                   m={"10px 5%"}
                   ref={checkBoard}
-                  placeholder={localStorage.getItem("boardTitle")}
+                  placeholder={boardTitle}
                   onChange={(e) => setCheckBoardTitle(e.target.value)}
                 />
                 <FormErrorMessage ml={"5%"}>
@@ -187,11 +187,7 @@ function List({ boards }) {
               <Center
                 w={"220px"}
                 key={list.id}
-                bg={
-                  boards
-                    .filter((b) => b.id - localStorage.getItem("boardId") === 0)
-                    .at(0).color
-                }
+                bg={localStorage.getItem("boardColor")}
                 borderRadius={"15px"}
               >
                 <Box
@@ -314,6 +310,7 @@ function List({ boards }) {
                     m={"10px auto"}
                     color={"black"}
                     textAlign={"center"}
+                    cursor={"pointer"}
                   >
                     <FontAwesomeIcon icon={faPlus} />{" "}
                     <span style={{ marginLeft: "10px" }}>Add a card</span>
