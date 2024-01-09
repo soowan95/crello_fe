@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
 import List from "./List";
+import { instance } from "../../modules/axios_interceptor";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -32,55 +33,40 @@ function WorkSpacePage() {
 
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) navigate("/login");
-    else navigate("/u/board");
-  }, [navigate]);
-
-  useEffect(() => {
-    if (localStorage.getItem("accessToken")) {
+    else if (location.pathname === "/u/board") {
       handleBoards();
       handleRecentBoeard();
     }
-  }, [boards.length, navigate, location]);
+  }, [location]);
 
   const handleRecentBoeard = () => {
-    axios
-      .get("/api/v1/board/recent?email=" + localStorage.getItem("email"), {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
+    instance
+      .get("/api/v1/board/recent?email=" + localStorage.getItem("email"))
       .then(({ data }) => setRecentBoard(data));
   };
 
   const handleBoards = () => {
-    axios
-      .get("/api/v1/board/all?email=" + localStorage.getItem("email"), {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
-      .then(({ data }) => setBoards(data))
-      .catch((err) => {
-        if (err.response.status === 401) navigate("/login");
-      });
+    instance
+      .get("/api/v1/board/all?email=" + localStorage.getItem("email"))
+      .then(({ data }) => setBoards(data));
   };
 
   const handleCreate = () => {
-    axios
-      .post(
-        "/api/v1/board/create",
-        {
-          title: boardTitle,
-          email: localStorage.getItem("email"),
-        },
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        },
-      )
-      .then(() => handleBoards())
-      .catch(() => navigate("/login"));
+    instance
+      .post("/api/v1/board/create", {
+        title: boardTitle,
+        email: localStorage.getItem("email"),
+      })
+      .then(() => handleBoards());
+  };
+
+  const handleLogout = () => {
+    instance
+      .post("/logout", { email: localStorage.getItem("email") })
+      .then(() => {
+        localStorage.clear();
+        navigate("/");
+      });
   };
 
   return (
@@ -152,14 +138,7 @@ function WorkSpacePage() {
             </Center>
           </PopoverTrigger>
           <PopoverContent w={"100px"}>
-            <Button
-              onClick={() => {
-                localStorage.clear();
-                navigate("/");
-              }}
-            >
-              logout
-            </Button>
+            <Button onClick={handleLogout}>logout</Button>
           </PopoverContent>
         </Popover>
       </Flex>
