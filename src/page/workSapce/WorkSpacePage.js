@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -12,10 +13,10 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
@@ -26,6 +27,7 @@ function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
   const [boards, setBoards] = useState([]);
   const [recentBoard, setRecentBoard] = useState(null);
+  const [color, setColor] = useState("#1d285d");
 
   const navigate = useNavigate();
 
@@ -56,6 +58,7 @@ function WorkSpacePage() {
       .post("/api/v1/board/create", {
         title: boardTitle,
         email: localStorage.getItem("email"),
+        color: color,
       })
       .then(() => handleBoards());
   };
@@ -70,7 +73,7 @@ function WorkSpacePage() {
   };
 
   return (
-    <Box position={"relative"}>
+    <Box position={"relative"} style={{ body: { backgroud: "pink" } }}>
       <Flex
         w={{ lg: "100%", xl: "70%" }}
         h={"40px"}
@@ -104,6 +107,88 @@ function WorkSpacePage() {
               <Box m={"5px auto"}>Create board</Box>
               <PopoverCloseButton />
               <FormControl isInvalid={!boardTitle}>
+                <FormLabel fontSize={"0.8rem"} ml={4}>
+                  Board Color
+                </FormLabel>
+                <SimpleGrid
+                  w={"80%"}
+                  m={"10px auto"}
+                  columns={4}
+                  spacingX={10}
+                  spacingY={5}
+                >
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#1d285d"}
+                    onClick={() => setColor("#1d285d")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#621e1e"}
+                    onClick={() => setColor("#621e1e")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#e14d15"}
+                    onClick={() => setColor("#e14d15")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#e76060"}
+                    onClick={() => setColor("#e76060")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#542572"}
+                    onClick={() => setColor("#542572")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#386025"}
+                    onClick={() => setColor("#386025")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#45b0a8"}
+                    onClick={() => setColor("#45b0a8")}
+                    cursor={"pointer"}
+                  />
+                  <Box
+                    w={"30px"}
+                    h={"30px"}
+                    bg={"#c4b23c"}
+                    onClick={() => setColor("#c4b23c")}
+                    cursor={"pointer"}
+                  />
+                </SimpleGrid>
+                <Center
+                  w={"60%"}
+                  h={"150px"}
+                  m={"15px auto"}
+                  bg={color}
+                  borderRadius={"15px"}
+                >
+                  <Box
+                    w={"85%"}
+                    h={"85%"}
+                    bg={"rgba(255,255,255,0.24)"}
+                    borderRadius={"10px"}
+                  />
+                </Center>
+                <Divider />
                 <FormLabel fontSize={"0.8rem"} ml={4}>
                   Board Title
                 </FormLabel>
