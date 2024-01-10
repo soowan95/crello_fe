@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   faChevronLeft,
   faEllipsis,
+  faPen,
   faPlus,
   faTrash,
   faX,
@@ -37,11 +38,16 @@ function List({ boards }) {
   );
   const [listTitle, setListTitle] = useState(null);
   const [isAddingList, setIsAddingList] = useState(false);
+  const [isAddingCard, setIsAddingCard] = useState(false);
+  const [addingCardIdx, setAddingCardIdx] = useState(-1);
   const [isMovingList, setIsMovingList] = useState(false);
   const [lists, setLists] = useState([]);
   const [moveBoard, setMoveBoard] = useState(boardTitle);
   const [moveBoardId, setMoveBoardId] = useState(null);
   const [checkBoardTitle, setCheckBoardTitle] = useState(null);
+  const [cardTitle, setCardTitle] = useState(null);
+  const [hoverCardIdx, setHoverCardIdx] = useState(-1);
+  const [hoverListIdx, setHoverListIdx] = useState(-1);
 
   const addList = useRef(null);
   const checkBoard = useRef(null);
@@ -103,6 +109,21 @@ function List({ boards }) {
         localStorage.removeItem("boardTitle");
         localStorage.removeItem("boardColor");
         navigate("/u/board");
+      });
+  };
+
+  const handleCardTitle = (listId) => {
+    instance
+      .post("/api/v1/card/add", {
+        listId: listId,
+        boardId: localStorage.getItem("boardId"),
+        title: cardTitle,
+      })
+      .then(({ data }) => {
+        setLists(data);
+        setIsAddingCard(false);
+        setAddingCardIdx(-1);
+        setCardTitle(null);
       });
   };
 
@@ -183,12 +204,15 @@ function List({ boards }) {
           left={"50px"}
         >
           {lists.length !== 0 &&
-            lists.map((list) => (
+            lists.map((list, idx) => (
               <Center
                 w={"220px"}
+                h={"fit-content"}
                 key={list.id}
                 bg={localStorage.getItem("boardColor")}
                 borderRadius={"15px"}
+                onMouseOver={() => setHoverListIdx(idx)}
+                onMouseLeave={() => setHoverListIdx(-1)}
               >
                 <Box
                   w={"90%"}
@@ -305,16 +329,88 @@ function List({ boards }) {
                       </PopoverContent>
                     </Popover>
                   </Flex>
-                  <Box
-                    w={"90%"}
-                    m={"10px auto"}
-                    color={"black"}
-                    textAlign={"center"}
-                    cursor={"pointer"}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />{" "}
-                    <span style={{ marginLeft: "10px" }}>Add a card</span>
-                  </Box>
+                  {list.cards.length !== 0 &&
+                    list.cards.map((card, cidx) => (
+                      <Box
+                        key={card.id}
+                        w={"90%"}
+                        h={"40px"}
+                        lineHeight={"40px"}
+                        m={"10px auto"}
+                        bg={"rgba(0,0,0,0.32)"}
+                        pl={5}
+                        borderRadius={"10px"}
+                        onMouseOver={() => setHoverCardIdx(cidx)}
+                        onMouseLeave={() => setHoverCardIdx(-1)}
+                        position={"relative"}
+                        cursor={"pointer"}
+                        _hover={{ border: "1px solid #49ca94" }}
+                      >
+                        {card.title}{" "}
+                        {hoverListIdx === idx && hoverCardIdx === cidx && (
+                          <span
+                            style={{
+                              fontSize: "0.7rem",
+                              display: "inline-block",
+                              position: "absolute",
+                              top: "-3px",
+                              right: "15px",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faPen} />
+                          </span>
+                        )}
+                      </Box>
+                    ))}
+                  {isAddingCard && addingCardIdx === idx && (
+                    <Box>
+                      <Input
+                        w={"90%"}
+                        m={"0px 5%"}
+                        bg={"rgba(0,0,0,0.32)"}
+                        placeholder={"Input a title"}
+                        onChange={(e) => setCardTitle(e.target.value)}
+                      />
+                      <Flex my={"10px"}>
+                        <Button
+                          ml={"5%"}
+                          size={"sm"}
+                          colorScheme={"blue"}
+                          onClick={() => handleCardTitle(list.id)}
+                        >
+                          Add card
+                        </Button>
+                        <Button
+                          ml={1}
+                          size={"sm"}
+                          onClick={() => {
+                            setIsAddingCard(false);
+                            setAddingCardIdx(-1);
+                            setCardTitle(null);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faX} />
+                        </Button>
+                      </Flex>
+                    </Box>
+                  )}
+                  {addingCardIdx !== idx && (
+                    <Box
+                      w={"90%"}
+                      m={"10px auto"}
+                      color={"black"}
+                      textAlign={"center"}
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setIsAddingCard(true);
+                        setAddingCardIdx(idx);
+                        setCardTitle(null);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faPlus} />{" "}
+                      <span style={{ marginLeft: "10px" }}>Add a card</span>
+                    </Box>
+                  )}
                 </Box>
               </Center>
             ))}
