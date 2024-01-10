@@ -9,6 +9,10 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
   Popover,
   PopoverCloseButton,
   PopoverContent,
@@ -17,11 +21,14 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import {
+  faAlignLeft,
   faChevronLeft,
   faEllipsis,
+  faHardDrive,
   faPen,
   faPlus,
   faTrash,
@@ -31,6 +38,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListTitleComp from "../../component/ListTitleComp";
 import { instance } from "../../modules/axios_interceptor";
 import { useNavigate } from "react-router-dom";
+import EditorBox from "../../component/EditorBox";
 
 function List({ boards }) {
   const [boardTitle, setBoardTitle] = useState(
@@ -46,11 +54,16 @@ function List({ boards }) {
   const [moveBoardId, setMoveBoardId] = useState(null);
   const [checkBoardTitle, setCheckBoardTitle] = useState(null);
   const [cardTitle, setCardTitle] = useState(null);
+  const [currentCardTitle, setCurrentCardTitle] = useState(null);
   const [hoverCardIdx, setHoverCardIdx] = useState(-1);
   const [hoverListIdx, setHoverListIdx] = useState(-1);
+  const [cardId, setCardId] = useState(null);
+  const [cardContent, setCardContent] = useState(null);
 
   const addList = useRef(null);
   const checkBoard = useRef(null);
+
+  const { onOpen, isOpen, onClose } = useDisclosure();
 
   const navigate = useNavigate();
 
@@ -125,6 +138,17 @@ function List({ boards }) {
         setAddingCardIdx(-1);
         setCardTitle(null);
       });
+  };
+
+  const changeCardTitle = () => {
+    instance
+      .put("/api/v1/card/update", {
+        id: cardId,
+        boardId: localStorage.getItem("boardId"),
+        title: cardTitle,
+        content: cardContent,
+      })
+      .then(({ data }) => setLists(data));
   };
 
   return (
@@ -345,6 +369,12 @@ function List({ boards }) {
                         position={"relative"}
                         cursor={"pointer"}
                         _hover={{ border: "1px solid #49ca94" }}
+                        onClick={() => {
+                          onOpen();
+                          setCardTitle(card.title);
+                          setCurrentCardTitle(card.title);
+                          setCardId(card.id);
+                        }}
                       >
                         {card.title}{" "}
                         {hoverListIdx === idx && hoverCardIdx === cidx && (
@@ -360,8 +390,62 @@ function List({ boards }) {
                             <FontAwesomeIcon icon={faPen} />
                           </span>
                         )}
+                        {card.content !== null && <br />}
+                        {card.content !== null && (
+                          <span style={{ marginLeft: "5px" }}>
+                            <FontAwesomeIcon icon={faAlignLeft} />
+                          </span>
+                        )}
                       </Box>
                     ))}
+                  <Modal
+                    isOpen={isOpen}
+                    onClose={() => {
+                      onClose();
+                      setCardTitle(null);
+                      setCurrentCardTitle(null);
+                      setCardId(null);
+                      setCardContent(null);
+                    }}
+                    size={"xl"}
+                    isCentered={true}
+                  >
+                    <ModalContent>
+                      <ModalHeader>
+                        <Flex>
+                          <Box>
+                            <FontAwesomeIcon icon={faHardDrive} />
+                          </Box>
+                          <Editable
+                            w={"fit-content"}
+                            h={"30px"}
+                            ml={5}
+                            value={cardTitle}
+                            borderRadius={"10px"}
+                            onChange={(e) => {
+                              setCardTitle(e);
+                            }}
+                            onSubmit={(e) => {
+                              if (e === "") setCardTitle(currentCardTitle);
+                              else if (cardTitle !== currentCardTitle)
+                                changeCardTitle();
+                            }}
+                          >
+                            <EditablePreview />
+                            <EditableInput />
+                          </Editable>
+                        </Flex>
+                      </ModalHeader>
+                      <ModalBody>
+                        <Flex>
+                          <Box>
+                            <FontAwesomeIcon icon={faAlignLeft} />
+                          </Box>
+                          <EditorBox setCardContent={setCardContent} />
+                        </Flex>
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
                   {isAddingCard && addingCardIdx === idx && (
                     <Box>
                       <Input
