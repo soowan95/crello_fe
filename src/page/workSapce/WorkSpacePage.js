@@ -75,7 +75,7 @@ function WorkSpacePage() {
   return (
     <Box position={"relative"} style={{ body: { backgroud: "pink" } }}>
       <Flex
-        w={{ lg: "100%", xl: "70%" }}
+        w={{ base: "100%", xl: "70%" }}
         h={"40px"}
         m={"0 auto"}
         borderBottom={"1px solid white"}
@@ -87,7 +87,7 @@ function WorkSpacePage() {
       >
         <Box
           h={"100%"}
-          w={"10%"}
+          w={"100px"}
           cursor={"pointer"}
           fontSize={"1.2rem"}
           textAlign={"center"}

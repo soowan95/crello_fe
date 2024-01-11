@@ -3,7 +3,7 @@ import "react-quill/dist/quill.snow.css";
 import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 
-function EditorBox() {
+function EditorBox({ setCardContent, cardContent }) {
   const [values, setValues] = useState(null);
 
   const modules = {
@@ -39,19 +39,25 @@ function EditorBox() {
 
   return (
     <Box
-      ml={"20px"}
       sx={{
         ".ql-editor": {
           width: "100%",
           height: "300px",
         },
+        ".ql-toolbar.ql-snow": {
+          background: "white",
+        },
       }}
     >
       <ReactQuill
+        defaultValue={cardContent}
         theme="snow"
         modules={modules}
         formats={formats}
-        onChange={setValues}
+        onChange={(e) => {
+          if (e === "" || e === "<p><br></p>") setCardContent(null);
+          else setCardContent(e);
+        }}
       />
     </Box>
   );
