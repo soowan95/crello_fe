@@ -29,6 +29,11 @@
     border-color: #64ee54;
 }
 
+.preview.active {
+    background-color: rgba(239, 238, 243, 0.36);
+    border-color: #3da6fc;
+}
+
 .preview_msg {
     font-weight: 500;
     font-size: 18px;

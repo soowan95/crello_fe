@@ -1,24 +1,16 @@
 import { Editable, EditableInput, EditablePreview } from "@chakra-ui/react";
 import { useState } from "react";
-import axios from "axios";
+import { instance } from "../modules/axios_interceptor";
 
 function ListTitleComp({ title, id }) {
   const [listTitle, setListTitle] = useState(title);
 
   const handleTitle = (title) => {
     localStorage.setItem("boardTitle", title);
-    axios.put(
-      "/api/v1/list/update",
-      {
-        title: title,
-        id: id,
-      },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      },
-    );
+    instance.put("/api/v1/list/update", {
+      title: title,
+      id: id,
+    });
   };
 
   return (
