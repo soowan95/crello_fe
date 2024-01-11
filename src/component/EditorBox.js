@@ -1,11 +1,8 @@
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 
 function EditorBox({ setCardContent, cardContent }) {
-  const [values, setValues] = useState(null);
-
   const modules = {
     toolbar: {
       container: [

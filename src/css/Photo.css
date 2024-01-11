@@ -1,0 +1,42 @@
+.file {
+    display: none;
+}
+
+.file::file-selector-button {
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 12px;
+    padding: 4px 32px;
+    cursor: pointer;
+}
+
+.preview {
+    width: 300px;
+    height: 300px;
+    margin: auto;
+    border-radius: 10px;
+    border: 3px dashed #eee;
+    padding: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.preview:hover {
+    border-color: #64ee54;
+}
+
+.preview_msg {
+    font-weight: 500;
+    font-size: 18px;
+    margin: 20px 0 10px;
+}
+
+.preview_desc {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 14px;
+}

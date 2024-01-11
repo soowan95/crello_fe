@@ -60,6 +60,7 @@ function WelcomePage() {
             localStorage.setItem("refreshToken", data.refreshToken);
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
+            localStorage.setItem("photo", data.photo);
             navigate("/u/board");
           });
       })

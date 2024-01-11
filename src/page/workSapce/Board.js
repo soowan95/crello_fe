@@ -1,7 +1,6 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../../modules/axios_interceptor";
 
