@@ -56,7 +56,7 @@ instance.interceptors.response.use(
         localStorage.clear();
       }
     } else if (response.status === 403) {
-      window.location.href = "/login";
+      window.location.href = "/";
       localStorage.clear();
     }
     return Promise.reject(error);

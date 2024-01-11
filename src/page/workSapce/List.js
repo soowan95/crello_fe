@@ -2,14 +2,18 @@ import {
   Box,
   Button,
   Center,
+  Divider,
   Editable,
   EditableInput,
   EditablePreview,
   Flex,
   FormControl,
-  FormErrorIcon,
   FormErrorMessage,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalHeader,
   Popover,
   PopoverCloseButton,
   PopoverContent,
@@ -18,11 +22,15 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import {
+  faAlignLeft,
   faChevronLeft,
   faEllipsis,
+  faHardDrive,
+  faPen,
   faPlus,
   faTrash,
   faX,
@@ -31,6 +39,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ListTitleComp from "../../component/ListTitleComp";
 import { instance } from "../../modules/axios_interceptor";
 import { useNavigate } from "react-router-dom";
+import EditorBox from "../../component/EditorBox";
 
 function List({ boards }) {
   const [boardTitle, setBoardTitle] = useState(
@@ -38,14 +47,26 @@ function List({ boards }) {
   );
   const [listTitle, setListTitle] = useState(null);
   const [isAddingList, setIsAddingList] = useState(false);
+  const [isAddingCard, setIsAddingCard] = useState(false);
+  const [isAddingCardContent, setIsAddingCardContent] = useState(false);
+  const [addingCardIdx, setAddingCardIdx] = useState(-1);
   const [isMovingList, setIsMovingList] = useState(false);
   const [lists, setLists] = useState([]);
   const [moveBoard, setMoveBoard] = useState(boardTitle);
   const [moveBoardId, setMoveBoardId] = useState(null);
   const [checkBoardTitle, setCheckBoardTitle] = useState(null);
+  const [cardTitle, setCardTitle] = useState(null);
+  const [currentCardTitle, setCurrentCardTitle] = useState(null);
+  const [currentCardContent, setCurrentCardContent] = useState(null);
+  const [hoverCardIdx, setHoverCardIdx] = useState(-1);
+  const [hoverListIdx, setHoverListIdx] = useState(-1);
+  const [cardId, setCardId] = useState(null);
+  const [cardContent, setCardContent] = useState(null);
 
   const addList = useRef(null);
   const checkBoard = useRef(null);
+
+  const { onOpen, isOpen, onClose } = useDisclosure();
 
   const navigate = useNavigate();
 
@@ -102,7 +123,38 @@ function List({ boards }) {
       .then(() => {
         localStorage.removeItem("boardId");
         localStorage.removeItem("boardTitle");
+        localStorage.removeItem("boardColor");
         navigate("/u/board");
+      });
+  };
+
+  const handleCardTitle = (listId) => {
+    instance
+      .post("/api/v1/card/add", {
+        listId: listId,
+        boardId: localStorage.getItem("boardId"),
+        title: cardTitle,
+      })
+      .then(({ data }) => {
+        setLists(data);
+        setIsAddingCard(false);
+        setAddingCardIdx(-1);
+        setCardTitle(null);
+      });
+  };
+
+  const changeCard = () => {
+    instance
+      .put("/api/v1/card/update", {
+        id: cardId,
+        boardId: localStorage.getItem("boardId"),
+        title: cardTitle,
+        content: cardContent,
+      })
+      .then(({ data }) => {
+        setLists(data);
+        setIsAddingCardContent(false);
+        setCardContent(null);
       });
   };
 
@@ -153,7 +205,7 @@ function List({ boards }) {
                   w={"90%"}
                   m={"10px 5%"}
                   ref={checkBoard}
-                  placeholder={localStorage.getItem("boardTitle")}
+                  placeholder={boardTitle}
                   onChange={(e) => setCheckBoardTitle(e.target.value)}
                 />
                 <FormErrorMessage ml={"5%"}>
@@ -183,16 +235,15 @@ function List({ boards }) {
           left={"50px"}
         >
           {lists.length !== 0 &&
-            lists.map((list) => (
+            lists.map((list, idx) => (
               <Center
                 w={"220px"}
+                h={"fit-content"}
                 key={list.id}
-                bg={
-                  boards
-                    .filter((b) => b.id - localStorage.getItem("boardId") === 0)
-                    .at(0).color
-                }
+                bg={localStorage.getItem("boardColor")}
                 borderRadius={"15px"}
+                onMouseOver={() => setHoverListIdx(idx)}
+                onMouseLeave={() => setHoverListIdx(-1)}
               >
                 <Box
                   w={"90%"}
@@ -212,7 +263,15 @@ function List({ boards }) {
                       onClose={() => setIsMovingList(false)}
                     >
                       <PopoverTrigger>
-                        <Box mt={"5px"} mr={"5px"} cursor={"pointer"}>
+                        <Box
+                          mt={"5px"}
+                          mr={"5px"}
+                          cursor={"pointer"}
+                          onClick={() => {
+                            setIsAddingCard(false);
+                            setAddingCardIdx(-1);
+                          }}
+                        >
                           <FontAwesomeIcon icon={faEllipsis} />
                         </Box>
                       </PopoverTrigger>
@@ -240,10 +299,20 @@ function List({ boards }) {
                             </Flex>
                           )}
                         </PopoverHeader>
-                        <PopoverCloseButton />
+                        <PopoverCloseButton id={"popoverClose"} />
                         {!isMovingList && (
                           <Box>
-                            <Box ml={"10px"} my={"20px"} cursor={"pointer"}>
+                            <Box
+                              ml={"10px"}
+                              my={"20px"}
+                              cursor={"pointer"}
+                              onClick={() => {
+                                document.getElementById("popoverClose").click();
+                                setIsAddingCard(true);
+                                setAddingCardIdx(idx);
+                                setCardTitle(null);
+                              }}
+                            >
                               Add card
                             </Box>
                             <Box
@@ -309,15 +378,212 @@ function List({ boards }) {
                       </PopoverContent>
                     </Popover>
                   </Flex>
-                  <Box
-                    w={"90%"}
-                    m={"10px auto"}
-                    color={"black"}
-                    textAlign={"center"}
+                  {list.cards.length !== 0 &&
+                    list.cards.map((card, cidx) => (
+                      <Box
+                        key={card.id}
+                        w={"90%"}
+                        h={"fit-content"}
+                        lineHeight={"40px"}
+                        m={"10px auto"}
+                        bg={"rgba(0,0,0,0.32)"}
+                        pl={5}
+                        borderRadius={"10px"}
+                        onMouseOver={() => setHoverCardIdx(cidx)}
+                        onMouseLeave={() => setHoverCardIdx(-1)}
+                        position={"relative"}
+                        cursor={"pointer"}
+                        _hover={{ border: "1px solid #49ca94" }}
+                        onClick={() => {
+                          onOpen();
+                          setCardTitle(card.title);
+                          setCurrentCardTitle(card.title);
+                          setCardId(card.id);
+                          setCardContent(card.content);
+                          setCurrentCardContent(card.content);
+                        }}
+                      >
+                        {card.title}{" "}
+                        {hoverListIdx === idx && hoverCardIdx === cidx && (
+                          <span
+                            style={{
+                              fontSize: "0.7rem",
+                              display: "inline-block",
+                              position: "absolute",
+                              top: "-3px",
+                              right: "15px",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faPen} />
+                          </span>
+                        )}
+                        {card.content !== null && (
+                          <div style={{ marginTop: "-10px" }}>
+                            <FontAwesomeIcon icon={faAlignLeft} />
+                          </div>
+                        )}
+                      </Box>
+                    ))}
+                  <Modal
+                    isOpen={isOpen}
+                    onClose={() => {
+                      onClose();
+                      setCardTitle(null);
+                      setCurrentCardTitle(null);
+                      setCardId(null);
+                      setCardContent(null);
+                      setCurrentCardContent(null);
+                    }}
+                    size={"xl"}
+                    isCentered={true}
                   >
-                    <FontAwesomeIcon icon={faPlus} />{" "}
-                    <span style={{ marginLeft: "10px" }}>Add a card</span>
-                  </Box>
+                    <ModalContent>
+                      <ModalHeader>
+                        <Flex>
+                          <Box>
+                            <FontAwesomeIcon icon={faHardDrive} />
+                          </Box>
+                          <Editable
+                            w={"fit-content"}
+                            h={"30px"}
+                            ml={5}
+                            value={cardTitle}
+                            borderRadius={"10px"}
+                            onChange={(e) => {
+                              setCardTitle(e);
+                            }}
+                            onSubmit={(e) => {
+                              if (e === "") setCardTitle(currentCardTitle);
+                              else if (cardTitle !== currentCardTitle)
+                                changeCard();
+                            }}
+                          >
+                            <EditablePreview />
+                            <EditableInput />
+                          </Editable>
+                        </Flex>
+                      </ModalHeader>
+                      <ModalBody>
+                        <Flex>
+                          <Box>
+                            <FontAwesomeIcon icon={faAlignLeft} />
+                          </Box>
+                          <Box ml={"25px"}>
+                            <Box mb={"20px"}>Description</Box>
+                            {!isAddingCardContent && cardContent === null && (
+                              <Button
+                                sx={{ width: "500px", margin: "10px auto" }}
+                                onClick={() => setIsAddingCardContent(true)}
+                              >
+                                Add a more detailed description...
+                              </Button>
+                            )}
+                            {!isAddingCardContent && cardContent !== null && (
+                              <Box
+                                my={"10px"}
+                                w={"500px"}
+                                position={"relative"}
+                              >
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: cardContent,
+                                  }}
+                                />
+                                <Button
+                                  position={"absolute"}
+                                  size={"sm"}
+                                  top={0}
+                                  right={10}
+                                  onClick={() => setIsAddingCardContent(true)}
+                                >
+                                  Edit
+                                </Button>
+                              </Box>
+                            )}
+                            {isAddingCardContent && (
+                              <Box m={"10px auto"}>
+                                <EditorBox
+                                  setCardContent={setCardContent}
+                                  cardContent={cardContent}
+                                />
+                                <Flex my={"10px"}>
+                                  <Button
+                                    size={"sm"}
+                                    colorScheme={"blue"}
+                                    onClick={() => {
+                                      onClose();
+                                      changeCard();
+                                    }}
+                                  >
+                                    Save
+                                  </Button>
+                                  <Button
+                                    ml={1}
+                                    size={"sm"}
+                                    onClick={() => {
+                                      setIsAddingCardContent(false);
+                                      setCardContent(currentCardContent);
+                                    }}
+                                  >
+                                    <FontAwesomeIcon icon={faX} />
+                                  </Button>
+                                </Flex>
+                              </Box>
+                            )}
+                          </Box>
+                        </Flex>
+                      </ModalBody>
+                    </ModalContent>
+                  </Modal>
+                  {isAddingCard && addingCardIdx === idx && (
+                    <Box>
+                      <Input
+                        w={"90%"}
+                        m={"0px 5%"}
+                        bg={"rgba(0,0,0,0.32)"}
+                        placeholder={"Input a title"}
+                        onChange={(e) => setCardTitle(e.target.value)}
+                      />
+                      <Flex my={"10px"}>
+                        <Button
+                          ml={"5%"}
+                          size={"sm"}
+                          colorScheme={"blue"}
+                          onClick={() => handleCardTitle(list.id)}
+                        >
+                          Add card
+                        </Button>
+                        <Button
+                          ml={1}
+                          size={"sm"}
+                          onClick={() => {
+                            setIsAddingCard(false);
+                            setAddingCardIdx(-1);
+                            setCardTitle(null);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faX} />
+                        </Button>
+                      </Flex>
+                    </Box>
+                  )}
+                  {addingCardIdx !== idx && (
+                    <Box
+                      w={"90%"}
+                      m={"10px auto"}
+                      color={"black"}
+                      textAlign={"center"}
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setIsAddingCard(true);
+                        setAddingCardIdx(idx);
+                        setCardTitle(null);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faPlus} />{" "}
+                      <span style={{ marginLeft: "10px" }}>Add a card</span>
+                    </Box>
+                  )}
                 </Box>
               </Center>
             ))}

@@ -18,6 +18,10 @@ function Board({ boards, recentBoard }) {
       .then(() => {
         localStorage.setItem("boardId", id);
         localStorage.setItem("boardTitle", title);
+        localStorage.setItem(
+          "boardColor",
+          boards.filter((b) => b.id - id === 0).at(0).color,
+        );
         navigate("/u/list");
       });
   };
