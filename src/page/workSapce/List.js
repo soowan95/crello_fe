@@ -72,11 +72,7 @@ function List({ boards }) {
 
   useEffect(() => {
     instance
-      .get("/api/v1/list/all?boardId=" + localStorage.getItem("boardId"), {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      })
+      .get("/api/v1/list/all?boardId=" + localStorage.getItem("boardId"))
       .then(({ data }) => setLists(data));
   }, []);
 
@@ -159,15 +155,26 @@ function List({ boards }) {
   };
 
   const onDragEnd = (result) => {
-    console.log(result);
-    // if (result.destination.droppableId !== result.source.droppableId)
-    //   instance
-    //     .put("/api/v1/card/move", {
-    //       cardId: result.draggableId.split("-")[1],
-    //       nextListId: result.destination.droppableId.split("-")[1],
-    //       boardId: localStorage.getItem("boardId"),
-    //     })
-    //     .then(({ data }) => setLists(data));
+    const prevIndex = result.source.index;
+    const nextIndex = result.destination.index;
+    const prevListId = result.source.droppableId.split("-")[1];
+    const nextListId = result.destination.droppableId.split("-")[1];
+    const cardId = result.draggableId.split("-")[1];
+    const resultList = Array.from(lists);
+    let removed;
+    if (prevListId !== nextListId || nextIndex !== prevIndex)
+      instance
+        .put("/api/v1/card/move", {
+          cardId: cardId,
+          nextListId: nextListId,
+          nextIndex: nextIndex,
+          prevListId: prevListId,
+          boardId: localStorage.getItem("boardId"),
+        })
+        .then(({ data }) => {
+          setLists(data);
+          window.location.reload();
+        });
   };
 
   return (
@@ -605,6 +612,9 @@ function List({ boards }) {
                                 size={"sm"}
                                 colorScheme={"blue"}
                                 onClick={() => handleCardTitle(list.id)}
+                                isDisabled={
+                                  cardTitle === null || cardTitle === ""
+                                }
                               >
                                 Add card
                               </Button>
