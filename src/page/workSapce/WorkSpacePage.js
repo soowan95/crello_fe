@@ -234,8 +234,12 @@ function WorkSpacePage() {
               <Box my={"5px"} fontSize={"0.8rem"} fontWeight={"bold"}>
                 Account
               </Box>
-              <Box ml={"10px"}>{localStorage.getItem("nickname")}</Box>
-              <Box ml={"10px"}>{localStorage.getItem("email")}</Box>
+              <Box my={"5px"} ml={"10px"} fontSize={"0.8rem"}>
+                {localStorage.getItem("email")}
+              </Box>
+              <Box my={"5px"} ml={"10px"}>
+                {localStorage.getItem("nickname")}
+              </Box>
               <Flex
                 cursor={"pointer"}
                 mt={"10px"}
