@@ -14,7 +14,7 @@
 .preview {
     width: 300px;
     height: 300px;
-    margin: auto;
+    margin: 20px auto;
     border-radius: 10px;
     border: 3px dashed #eee;
     padding: 70px;

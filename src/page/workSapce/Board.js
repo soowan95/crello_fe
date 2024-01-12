@@ -7,8 +7,6 @@ import { instance } from "../../modules/axios_interceptor";
 function Board({ boards, recentBoard }) {
   const navigate = useNavigate();
 
-  console.log(recentBoard);
-
   const handleBoard = (id, title) => {
     instance
       .put("/api/v1/board/updateRecent", {

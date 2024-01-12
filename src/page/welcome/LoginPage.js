@@ -38,7 +38,12 @@ function LoginPage() {
       .catch((err) => {
         if (err.response.status === 401) {
           toast({
-            description: "로그인 정보가 일지하지 않습니다.",
+            description: err.response.data.msg,
+            status: "error",
+          });
+        } else if (err.response.status === 403) {
+          toast({
+            description: "비밀번호가 일치하지 않습니다.",
             status: "error",
           });
         }

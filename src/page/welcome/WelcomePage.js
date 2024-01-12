@@ -135,7 +135,6 @@ function WelcomePage() {
           {!emailValidate && !securityCode && (
             <Flex mt={"30px"} alignItems={"center"}>
               <Input
-                id={"firstEmail"}
                 w={"30%"}
                 mr={"3px"}
                 placeholder={"Email"}
@@ -143,7 +142,6 @@ function WelcomePage() {
               />
               @
               <Input
-                if={"secondEmail"}
                 ref={secondEmailValue}
                 w={"50%"}
                 ml={"3px"}
@@ -227,14 +225,12 @@ function WelcomePage() {
           {emailValidate && (
             <FormControl isInvalid={password !== checkPassword}>
               <Input
-                id={"password"}
                 mt={"15px"}
                 type={"password"}
                 placeholder={"Password"}
                 onChange={(e) => setPassword(e.target.value)}
               />
               <Input
-                id={"checkPassword"}
                 mt={"15px"}
                 type={"password"}
                 placeholder={"CheckPassword"}
