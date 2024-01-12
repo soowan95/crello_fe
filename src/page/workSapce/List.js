@@ -160,8 +160,6 @@ function List({ boards }) {
     const prevListId = result.source.droppableId.split("-")[1];
     const nextListId = result.destination.droppableId.split("-")[1];
     const cardId = result.draggableId.split("-")[1];
-    const resultList = Array.from(lists);
-    let removed;
     if (prevListId !== nextListId || nextIndex !== prevIndex)
       instance
         .put("/api/v1/card/move", {
@@ -171,10 +169,7 @@ function List({ boards }) {
           prevListId: prevListId,
           boardId: localStorage.getItem("boardId"),
         })
-        .then(({ data }) => {
-          setLists(data);
-          window.location.reload();
-        });
+        .then(() => window.location.reload());
   };
 
   return (

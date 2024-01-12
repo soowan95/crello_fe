@@ -85,7 +85,7 @@ function SignUp() {
         emailjs
           .send(
             `${process.env.REACT_APP_EMAILJS_SERVICEID}`,
-            `${process.env.REACT_APP_EMAILJS_TEMPLATEID}`,
+            `${process.env.REACT_APP_EMAILJS_SIGNUP_TEMPLATEID}`,
             { securityCode: code, userEmail: firstEmail + "@" + secondEmail },
             `${process.env.REACT_APP_EMAILJS_PUBLICKEY}`,
           )
@@ -117,6 +117,7 @@ function SignUp() {
         h={"100px"}
         lineHeight={"100px"}
         textAlign={"center"}
+        cursor={"pointer"}
         onClick={() => navigate("/")}
       >
         <FontAwesomeIcon icon={faChartSimple} /> Crello

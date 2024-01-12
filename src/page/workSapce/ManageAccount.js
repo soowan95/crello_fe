@@ -74,7 +74,7 @@ function ManageAccount() {
 
   const handleNickName = (nickname) => {
     instance
-      .put("/api/v1/user/update", {
+      .putForm("/api/v1/user/update", {
         email: localStorage.getItem("email"),
         nickname: nickname,
       })
@@ -115,7 +115,7 @@ function ManageAccount() {
   };
 
   return (
-    <Box w={"500px"} h={"700px"} m={"100px auto"} border={"1px solid"}>
+    <Box w={"500px"} h={"500px"} m={"200px auto"}>
       <Box
         w={"100%"}
         h={"200px"}
@@ -371,16 +371,32 @@ function ManageAccount() {
         </FormControl>
       )}
       {!isCancleMemberShip && (
-        <Button
-          size={"sm"}
-          colorScheme={"blue"}
-          ml={"365px"}
-          my={"20px"}
-          onClick={handleChanges}
-          isDisabled={photo === null && password === null}
-        >
-          Save changes
-        </Button>
+        <Flex justifyContent={"right"}>
+          {isChangingPassword && (
+            <Button
+              size={"sm"}
+              mr={"10px"}
+              my={"20px"}
+              onClick={() => {
+                setIsChangingPassword(false);
+                setPassword(null);
+                setCheckPassword(null);
+              }}
+            >
+              <FontAwesomeIcon icon={faX} />
+            </Button>
+          )}
+          <Button
+            size={"sm"}
+            colorScheme={"blue"}
+            mr={"25px"}
+            my={"20px"}
+            onClick={handleChanges}
+            isDisabled={photo === null && password === null}
+          >
+            Save changes
+          </Button>
+        </Flex>
       )}
       {isCancleMemberShip && (
         <Button

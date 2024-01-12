@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 function LoginPage() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [attempt, setAttempt] = useState(0);
+  const [forgetPw, setForgetPw] = useState(false);
 
   const toast = useToast();
 
@@ -46,6 +48,11 @@ function LoginPage() {
             description: "비밀번호가 일치하지 않습니다.",
             status: "error",
           });
+          setAttempt((attempt) => attempt + 1);
+        }
+        if (attempt === 4) {
+          setAttempt(0);
+          setForgetPw(true);
         }
       });
   };
@@ -57,6 +64,7 @@ function LoginPage() {
         h={"100px"}
         lineHeight={"100px"}
         textAlign={"center"}
+        cursor={"pointer"}
         onClick={() => navigate("/")}
       >
         <FontAwesomeIcon icon={faChartSimple} /> Crello
@@ -83,6 +91,30 @@ function LoginPage() {
       >
         Continue
       </Button>
+      {forgetPw && (
+        <Flex
+          mt={"20px"}
+          mb={"-20px"}
+          w={"100%"}
+          h={"30px"}
+          justifyContent={"center"}
+        >
+          <Badge bg={"none"}>Forget your password ?</Badge>
+          <Box mx={"3px"} h={"100%"} lineHeight={"20px"} fontSize={"0.2rem"}>
+            <FontAwesomeIcon icon={faCircle} />
+          </Box>
+          <Badge
+            bg={"none"}
+            onClick={() => {
+              navigate("/cpw");
+              setForgetPw(false);
+            }}
+            cursor={"pointer"}
+          >
+            change password
+          </Badge>
+        </Flex>
+      )}
       <Flex mt={"20px"} w={"100%"} h={"30px"} justifyContent={"center"}>
         <Badge bg={"none"}>dont't you have accont ?</Badge>
         <Box mx={"3px"} h={"100%"} lineHeight={"20px"} fontSize={"0.2rem"}>

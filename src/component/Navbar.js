@@ -33,6 +33,7 @@ function Navbar() {
         h={"100%"}
         textAlign={"center"}
         lineHeight={"50px"}
+        cursor={"pointer"}
         onClick={() => navigate("/login")}
       >
         Sign In
@@ -45,6 +46,7 @@ function Navbar() {
         bg={"white"}
         color={"rgb(26,32,44)"}
         fontWeight={"bold"}
+        cursor={"pointer"}
         onClick={() => navigate("/signup")}
       >
         Sign Up
