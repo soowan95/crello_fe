@@ -11,6 +11,7 @@ import SignUp from "./page/welcome/SignUp";
 import WorkSpacePage from "./page/workSapce/WorkSpacePage";
 import Board from "./page/workSapce/Board";
 import List from "./page/workSapce/List";
+import ManageAccount from "./page/workSapce/ManageAccount";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
@@ -23,6 +24,7 @@ const routes = createBrowserRouter(
       <Route path="u" element={<WorkSpacePage />}>
         <Route path="board" element={<Board />} />
         <Route path="list" element={<List />} />
+        <Route path="manage" element={<ManageAccount />} />
       </Route>
     </Route>,
   ),

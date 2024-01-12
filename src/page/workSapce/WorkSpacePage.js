@@ -14,14 +14,19 @@ import {
   PopoverContent,
   PopoverTrigger,
   SimpleGrid,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChartSimple,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
 import List from "./List";
 import { instance } from "../../modules/axios_interceptor";
+import ManageAccount from "./ManageAccount";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
@@ -212,18 +217,48 @@ function WorkSpacePage() {
             </PopoverContent>
           </Popover>
         )}
-        <Popover placement={"bottom"}>
+        <Popover placement={"bottom-end"}>
           <PopoverTrigger>
-            <Center>
-              <Avatar
-                mr={"10px"}
-                size={"sm"}
-                name={localStorage.getItem("nickname")}
-              />
-            </Center>
+            <Box>
+              <Tooltip label={"account"}>
+                <Avatar
+                  mr={"10px"}
+                  size={"sm"}
+                  src={localStorage.getItem("photo")}
+                />
+              </Tooltip>
+            </Box>
           </PopoverTrigger>
-          <PopoverContent w={"100px"}>
-            <Button onClick={handleLogout}>logout</Button>
+          <PopoverContent w={"200px"}>
+            <Box my={"10px"} ml={"20px"}>
+              <Box my={"5px"} fontSize={"0.8rem"} fontWeight={"bold"}>
+                Account
+              </Box>
+              <Box ml={"10px"}>{localStorage.getItem("nickname")}</Box>
+              <Box ml={"10px"}>{localStorage.getItem("email")}</Box>
+              <Flex
+                cursor={"pointer"}
+                mt={"10px"}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+                w={"90%"}
+                onClick={() => navigate("/u/manage")}
+              >
+                <Box>Manage account</Box>
+                <Box>
+                  <FontAwesomeIcon icon={faPenToSquare} />
+                </Box>
+              </Flex>
+            </Box>
+            <Divider />
+            <Box
+              my={"10px"}
+              ml={"20px"}
+              cursor={"pointer"}
+              onClick={handleLogout}
+            >
+              logout
+            </Box>
           </PopoverContent>
         </Popover>
       </Flex>
@@ -231,6 +266,7 @@ function WorkSpacePage() {
         <Board boards={boards} recentBoard={recentBoard} />
       )}
       {location.pathname === "/u/list" && <List boards={boards} />}
+      {location.pathname === "/u/manage" && <ManageAccount />}
     </Box>
   );
 }

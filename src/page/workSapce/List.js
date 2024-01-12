@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Center,
-  Divider,
   Editable,
   EditableInput,
   EditablePreview,

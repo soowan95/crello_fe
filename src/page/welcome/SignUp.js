@@ -58,6 +58,7 @@ function SignUp() {
             localStorage.setItem("refreshToken", data.refreshToken);
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
+            localStorage.setItem("photo", data.photo);
             navigate("/u/board");
           });
       })
@@ -215,14 +216,12 @@ function SignUp() {
         {emailValidate && (
           <FormControl isInvalid={password !== checkPassword}>
             <Input
-              id={"password"}
               mt={"15px"}
               type={"password"}
               placeholder={"Password"}
               onChange={(e) => setPassword(e.target.value)}
             />
             <Input
-              id={"checkPassword"}
               mt={"15px"}
               type={"password"}
               placeholder={"CheckPassword"}
