@@ -39,6 +39,7 @@ import ListTitleComp from "../../component/ListTitleComp";
 import { instance } from "../../modules/axios_interceptor";
 import { useNavigate } from "react-router-dom";
 import EditorBox from "../../component/EditorBox";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 function List({ boards }) {
   const [boardTitle, setBoardTitle] = useState(
@@ -157,6 +158,18 @@ function List({ boards }) {
       });
   };
 
+  const onDragEnd = (result) => {
+    console.log(result);
+    // if (result.destination.droppableId !== result.source.droppableId)
+    //   instance
+    //     .put("/api/v1/card/move", {
+    //       cardId: result.draggableId.split("-")[1],
+    //       nextListId: result.destination.droppableId.split("-")[1],
+    //       boardId: localStorage.getItem("boardId"),
+    //     })
+    //     .then(({ data }) => setLists(data));
+  };
+
   return (
     <Box>
       <Box m={"80px auto"} position={"absolute"}>
@@ -233,359 +246,407 @@ function List({ boards }) {
           top={"30px"}
           left={"50px"}
         >
-          {lists.length !== 0 &&
-            lists.map((list, idx) => (
-              <Center
-                w={"220px"}
-                h={"fit-content"}
-                key={list.id}
-                bg={localStorage.getItem("boardColor")}
-                borderRadius={"15px"}
-                onMouseOver={() => setHoverListIdx(idx)}
-                onMouseLeave={() => setHoverListIdx(-1)}
-              >
-                <Box
-                  w={"90%"}
-                  bg={"rgba(255,255,255,0.24)"}
-                  my={"10px"}
-                  borderRadius={"10px"}
+          <DragDropContext onDragEnd={onDragEnd}>
+            {lists.length !== 0 &&
+              lists.map((list, idx) => (
+                <Droppable
+                  key={idx}
+                  droppableId={`list-${list.id}`}
+                  index={idx}
                 >
-                  <Flex
-                    h={"40px"}
-                    w={"90%"}
-                    m={"5px auto"}
-                    justifyContent={"space-between"}
-                  >
-                    <ListTitleComp title={list.title} id={list.id} />
-                    <Popover
-                      placement={"bottom-start"}
-                      onClose={() => setIsMovingList(false)}
+                  {(provided) => (
+                    <Center
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      w={"220px"}
+                      h={"fit-content"}
+                      bg={localStorage.getItem("boardColor")}
+                      borderRadius={"15px"}
+                      onMouseOver={() => setHoverListIdx(idx)}
+                      onMouseLeave={() => setHoverListIdx(-1)}
                     >
-                      <PopoverTrigger>
-                        <Box
-                          mt={"5px"}
-                          mr={"5px"}
-                          cursor={"pointer"}
-                          onClick={() => {
-                            setIsAddingCard(false);
-                            setAddingCardIdx(-1);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faEllipsis} />
-                        </Box>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        color={"black"}
-                        bg={"#e8e8e8"}
-                        w={"200px"}
-                        boxShadow={"5px 4px 6px rgba(40, 40, 40, 0.7)"}
-                      >
-                        <PopoverHeader textAlign={"center"}>
-                          {!isMovingList && (
-                            <Box fontWeight={"bold"}>List actions</Box>
-                          )}
-                          {isMovingList && (
-                            <Flex w={"70%"} justifyContent={"space-between"}>
-                              <Box
-                                fontSize={"0.8rem"}
-                                mt={"-1px"}
-                                cursor={"pointer"}
-                                onClick={() => setIsMovingList(false)}
-                              >
-                                <FontAwesomeIcon icon={faChevronLeft} />
-                              </Box>
-                              <Box fontWeight={"bold"}>Move list</Box>
-                            </Flex>
-                          )}
-                        </PopoverHeader>
-                        <PopoverCloseButton id={"popoverClose"} />
-                        {!isMovingList && (
-                          <Box>
-                            <Box
-                              ml={"10px"}
-                              my={"20px"}
-                              cursor={"pointer"}
-                              onClick={() => {
-                                document.getElementById("popoverClose").click();
-                                setIsAddingCard(true);
-                                setAddingCardIdx(idx);
-                                setCardTitle(null);
-                              }}
-                            >
-                              Add card
-                            </Box>
-                            <Box
-                              ml={"10px"}
-                              my={"20px"}
-                              cursor={"pointer"}
-                              onClick={() => setIsMovingList(true)}
-                            >
-                              Move list
-                            </Box>
-                            <Box
-                              ml={"10px"}
-                              my={"20px"}
-                              cursor={"pointer"}
-                              onClick={() => handleDeleteList(list.id)}
-                            >
-                              Delete List
-                            </Box>
-                          </Box>
-                        )}
-                        {isMovingList && (
-                          <Box
-                            w={"90%"}
-                            m={"10px 5%"}
-                            cursor={"pointer"}
-                            borderBottom={"1px solid white"}
-                            borderRadius={"8px"}
-                          >
-                            <Box ml={"10px"} mb={"10px"} fontSize={"0.7rem"}>
-                              board
-                            </Box>
-                            <RadioGroup
-                              onChange={(e) => {
-                                setMoveBoard(
-                                  boards.filter((b) => b.id - e === 0).at(0)
-                                    .title,
-                                );
-                                setMoveBoardId(e);
-                              }}
-                            >
-                              <Stack spacing={5}>
-                                {boards.length !== 0 &&
-                                  boards.map((board) => (
-                                    <Radio key={board.id} value={board.id}>
-                                      {board.title === boardTitle
-                                        ? board.title + " (current)"
-                                        : board.title}
-                                    </Radio>
-                                  ))}
-                              </Stack>
-                            </RadioGroup>
-                            <Button
-                              mt={"20px"}
-                              size={"sm"}
-                              colorScheme={"blue"}
-                              isDisabled={moveBoard === boardTitle}
-                              onClick={() => handleMoveList(list.id)}
-                            >
-                              Move
-                            </Button>
-                          </Box>
-                        )}
-                      </PopoverContent>
-                    </Popover>
-                  </Flex>
-                  {list.cards.length !== 0 &&
-                    list.cards.map((card, cidx) => (
                       <Box
-                        key={card.id}
                         w={"90%"}
-                        h={"fit-content"}
-                        lineHeight={"40px"}
-                        m={"10px auto"}
-                        bg={"rgba(0,0,0,0.32)"}
-                        pl={5}
+                        bg={"rgba(255,255,255,0.24)"}
+                        my={"10px"}
                         borderRadius={"10px"}
-                        onMouseOver={() => setHoverCardIdx(cidx)}
-                        onMouseLeave={() => setHoverCardIdx(-1)}
-                        position={"relative"}
-                        cursor={"pointer"}
-                        _hover={{ border: "1px solid #49ca94" }}
-                        onClick={() => {
-                          onOpen();
-                          setCardTitle(card.title);
-                          setCurrentCardTitle(card.title);
-                          setCardId(card.id);
-                          setCardContent(card.content);
-                          setCurrentCardContent(card.content);
-                        }}
                       >
-                        {card.title}{" "}
-                        {hoverListIdx === idx && hoverCardIdx === cidx && (
-                          <span
-                            style={{
-                              fontSize: "0.7rem",
-                              display: "inline-block",
-                              position: "absolute",
-                              top: "-3px",
-                              right: "15px",
-                            }}
+                        <Flex
+                          h={"40px"}
+                          w={"90%"}
+                          m={"5px auto"}
+                          justifyContent={"space-between"}
+                        >
+                          <ListTitleComp title={list.title} id={list.id} />
+                          <Popover
+                            placement={"bottom-start"}
+                            onClose={() => setIsMovingList(false)}
                           >
-                            <FontAwesomeIcon icon={faPen} />
-                          </span>
-                        )}
-                        {card.content !== null && (
-                          <div style={{ marginTop: "-10px" }}>
-                            <FontAwesomeIcon icon={faAlignLeft} />
-                          </div>
-                        )}
-                      </Box>
-                    ))}
-                  <Modal
-                    isOpen={isOpen}
-                    onClose={() => {
-                      onClose();
-                      setCardTitle(null);
-                      setCurrentCardTitle(null);
-                      setCardId(null);
-                      setCardContent(null);
-                      setCurrentCardContent(null);
-                    }}
-                    size={"xl"}
-                    isCentered={true}
-                  >
-                    <ModalContent>
-                      <ModalHeader>
-                        <Flex>
-                          <Box>
-                            <FontAwesomeIcon icon={faHardDrive} />
-                          </Box>
-                          <Editable
-                            w={"fit-content"}
-                            h={"30px"}
-                            ml={5}
-                            value={cardTitle}
-                            borderRadius={"10px"}
-                            onChange={(e) => {
-                              setCardTitle(e);
-                            }}
-                            onSubmit={(e) => {
-                              if (e === "") setCardTitle(currentCardTitle);
-                              else if (cardTitle !== currentCardTitle)
-                                changeCard();
-                            }}
-                          >
-                            <EditablePreview />
-                            <EditableInput />
-                          </Editable>
-                        </Flex>
-                      </ModalHeader>
-                      <ModalBody>
-                        <Flex>
-                          <Box>
-                            <FontAwesomeIcon icon={faAlignLeft} />
-                          </Box>
-                          <Box ml={"25px"}>
-                            <Box mb={"20px"}>Description</Box>
-                            {!isAddingCardContent && cardContent === null && (
-                              <Button
-                                sx={{ width: "500px", margin: "10px auto" }}
-                                onClick={() => setIsAddingCardContent(true)}
-                              >
-                                Add a more detailed description...
-                              </Button>
-                            )}
-                            {!isAddingCardContent && cardContent !== null && (
+                            <PopoverTrigger>
                               <Box
-                                my={"10px"}
-                                w={"500px"}
-                                position={"relative"}
+                                mt={"5px"}
+                                mr={"5px"}
+                                cursor={"pointer"}
+                                onClick={() => {
+                                  setIsAddingCard(false);
+                                  setAddingCardIdx(-1);
+                                }}
                               >
-                                <div
-                                  dangerouslySetInnerHTML={{
-                                    __html: cardContent,
-                                  }}
-                                />
-                                <Button
-                                  position={"absolute"}
-                                  size={"sm"}
-                                  top={0}
-                                  right={10}
-                                  onClick={() => setIsAddingCardContent(true)}
-                                >
-                                  Edit
-                                </Button>
+                                <FontAwesomeIcon icon={faEllipsis} />
                               </Box>
-                            )}
-                            {isAddingCardContent && (
-                              <Box m={"10px auto"}>
-                                <EditorBox
-                                  setCardContent={setCardContent}
-                                  cardContent={cardContent}
-                                />
-                                <Flex my={"10px"}>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              color={"black"}
+                              bg={"#e8e8e8"}
+                              w={"200px"}
+                              boxShadow={"5px 4px 6px rgba(40, 40, 40, 0.7)"}
+                            >
+                              <PopoverHeader textAlign={"center"}>
+                                {!isMovingList && (
+                                  <Box fontWeight={"bold"}>List actions</Box>
+                                )}
+                                {isMovingList && (
+                                  <Flex
+                                    w={"70%"}
+                                    justifyContent={"space-between"}
+                                  >
+                                    <Box
+                                      fontSize={"0.8rem"}
+                                      mt={"-1px"}
+                                      cursor={"pointer"}
+                                      onClick={() => setIsMovingList(false)}
+                                    >
+                                      <FontAwesomeIcon icon={faChevronLeft} />
+                                    </Box>
+                                    <Box fontWeight={"bold"}>Move list</Box>
+                                  </Flex>
+                                )}
+                              </PopoverHeader>
+                              <PopoverCloseButton id={"popoverClose"} />
+                              {!isMovingList && (
+                                <Box>
+                                  <Box
+                                    ml={"10px"}
+                                    my={"20px"}
+                                    cursor={"pointer"}
+                                    onClick={() => {
+                                      document
+                                        .getElementById("popoverClose")
+                                        .click();
+                                      setIsAddingCard(true);
+                                      setAddingCardIdx(idx);
+                                      setCardTitle(null);
+                                    }}
+                                  >
+                                    Add card
+                                  </Box>
+                                  <Box
+                                    ml={"10px"}
+                                    my={"20px"}
+                                    cursor={"pointer"}
+                                    onClick={() => setIsMovingList(true)}
+                                  >
+                                    Move list
+                                  </Box>
+                                  <Box
+                                    ml={"10px"}
+                                    my={"20px"}
+                                    cursor={"pointer"}
+                                    onClick={() => handleDeleteList(list.id)}
+                                  >
+                                    Delete List
+                                  </Box>
+                                </Box>
+                              )}
+                              {isMovingList && (
+                                <Box
+                                  w={"90%"}
+                                  m={"10px 5%"}
+                                  cursor={"pointer"}
+                                  borderBottom={"1px solid white"}
+                                  borderRadius={"8px"}
+                                >
+                                  <Box
+                                    ml={"10px"}
+                                    mb={"10px"}
+                                    fontSize={"0.7rem"}
+                                  >
+                                    board
+                                  </Box>
+                                  <RadioGroup
+                                    onChange={(e) => {
+                                      setMoveBoard(
+                                        boards
+                                          .filter((b) => b.id - e === 0)
+                                          .at(0).title,
+                                      );
+                                      setMoveBoardId(e);
+                                    }}
+                                  >
+                                    <Stack spacing={5}>
+                                      {boards.length !== 0 &&
+                                        boards.map((board) => (
+                                          <Radio
+                                            key={board.id}
+                                            value={board.id}
+                                          >
+                                            {board.title === boardTitle
+                                              ? board.title + " (current)"
+                                              : board.title}
+                                          </Radio>
+                                        ))}
+                                    </Stack>
+                                  </RadioGroup>
                                   <Button
+                                    mt={"20px"}
                                     size={"sm"}
                                     colorScheme={"blue"}
-                                    onClick={() => {
-                                      onClose();
-                                      changeCard();
-                                    }}
+                                    isDisabled={moveBoard === boardTitle}
+                                    onClick={() => handleMoveList(list.id)}
                                   >
-                                    Save
+                                    Move
                                   </Button>
-                                  <Button
-                                    ml={1}
-                                    size={"sm"}
-                                    onClick={() => {
-                                      setIsAddingCardContent(false);
-                                      setCardContent(currentCardContent);
-                                    }}
-                                  >
-                                    <FontAwesomeIcon icon={faX} />
-                                  </Button>
-                                </Flex>
-                              </Box>
-                            )}
-                          </Box>
+                                </Box>
+                              )}
+                            </PopoverContent>
+                          </Popover>
                         </Flex>
-                      </ModalBody>
-                    </ModalContent>
-                  </Modal>
-                  {isAddingCard && addingCardIdx === idx && (
-                    <Box>
-                      <Input
-                        w={"90%"}
-                        m={"0px 5%"}
-                        bg={"rgba(0,0,0,0.32)"}
-                        placeholder={"Input a title"}
-                        onChange={(e) => setCardTitle(e.target.value)}
-                      />
-                      <Flex my={"10px"}>
-                        <Button
-                          ml={"5%"}
-                          size={"sm"}
-                          colorScheme={"blue"}
-                          onClick={() => handleCardTitle(list.id)}
-                        >
-                          Add card
-                        </Button>
-                        <Button
-                          ml={1}
-                          size={"sm"}
-                          onClick={() => {
-                            setIsAddingCard(false);
-                            setAddingCardIdx(-1);
+                        {list.cards.length !== 0 &&
+                          list.cards.map((card, cidx) => (
+                            <Draggable
+                              key={cidx}
+                              draggableId={`card-${card.id}`}
+                              index={cidx}
+                            >
+                              {(provided) => (
+                                <Box
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  key={card.id}
+                                  w={"90%"}
+                                  h={"fit-content"}
+                                  lineHeight={"40px"}
+                                  m={"10px auto"}
+                                  bg={"rgba(0,0,0,0.32)"}
+                                  pl={5}
+                                  borderRadius={"10px"}
+                                  onMouseOver={() => setHoverCardIdx(cidx)}
+                                  onMouseLeave={() => setHoverCardIdx(-1)}
+                                  position={"relative"}
+                                  _hover={{ border: "1px solid #49ca94" }}
+                                  onClick={() => {
+                                    onOpen();
+                                    setCardTitle(card.title);
+                                    setCurrentCardTitle(card.title);
+                                    setCardId(card.id);
+                                    setCardContent(card.content);
+                                    setCurrentCardContent(card.content);
+                                  }}
+                                >
+                                  {card.title}{" "}
+                                  {hoverListIdx === idx &&
+                                    hoverCardIdx === cidx && (
+                                      <span
+                                        style={{
+                                          fontSize: "0.7rem",
+                                          display: "inline-block",
+                                          position: "absolute",
+                                          top: "-3px",
+                                          right: "15px",
+                                        }}
+                                      >
+                                        <FontAwesomeIcon icon={faPen} />
+                                      </span>
+                                    )}
+                                  {card.content !== null && (
+                                    <div style={{ marginTop: "-10px" }}>
+                                      <FontAwesomeIcon icon={faAlignLeft} />
+                                    </div>
+                                  )}
+                                </Box>
+                              )}
+                            </Draggable>
+                          ))}
+                        {provided.placeholder}
+                        <Modal
+                          isOpen={isOpen}
+                          onClose={() => {
+                            onClose();
                             setCardTitle(null);
+                            setCurrentCardTitle(null);
+                            setCardId(null);
+                            setCardContent(null);
+                            setCurrentCardContent(null);
                           }}
+                          size={"xl"}
+                          isCentered={true}
                         >
-                          <FontAwesomeIcon icon={faX} />
-                        </Button>
-                      </Flex>
-                    </Box>
+                          <ModalContent>
+                            <ModalHeader>
+                              <Flex>
+                                <Box>
+                                  <FontAwesomeIcon icon={faHardDrive} />
+                                </Box>
+                                <Editable
+                                  w={"fit-content"}
+                                  h={"30px"}
+                                  ml={5}
+                                  value={cardTitle}
+                                  borderRadius={"10px"}
+                                  onChange={(e) => {
+                                    setCardTitle(e);
+                                  }}
+                                  onSubmit={(e) => {
+                                    if (e === "")
+                                      setCardTitle(currentCardTitle);
+                                    else if (cardTitle !== currentCardTitle)
+                                      changeCard();
+                                  }}
+                                >
+                                  <EditablePreview />
+                                  <EditableInput />
+                                </Editable>
+                              </Flex>
+                            </ModalHeader>
+                            <ModalBody>
+                              <Flex>
+                                <Box>
+                                  <FontAwesomeIcon icon={faAlignLeft} />
+                                </Box>
+                                <Box ml={"25px"}>
+                                  <Box mb={"20px"}>Description</Box>
+                                  {!isAddingCardContent &&
+                                    cardContent === null && (
+                                      <Button
+                                        sx={{
+                                          width: "500px",
+                                          margin: "10px auto",
+                                        }}
+                                        onClick={() =>
+                                          setIsAddingCardContent(true)
+                                        }
+                                      >
+                                        Add a more detailed description...
+                                      </Button>
+                                    )}
+                                  {!isAddingCardContent &&
+                                    cardContent !== null && (
+                                      <Box
+                                        my={"10px"}
+                                        w={"500px"}
+                                        position={"relative"}
+                                      >
+                                        <div
+                                          dangerouslySetInnerHTML={{
+                                            __html: cardContent,
+                                          }}
+                                        />
+                                        <Button
+                                          position={"absolute"}
+                                          size={"sm"}
+                                          top={0}
+                                          right={10}
+                                          onClick={() =>
+                                            setIsAddingCardContent(true)
+                                          }
+                                        >
+                                          Edit
+                                        </Button>
+                                      </Box>
+                                    )}
+                                  {isAddingCardContent && (
+                                    <Box m={"10px auto"}>
+                                      <EditorBox
+                                        setCardContent={setCardContent}
+                                        cardContent={cardContent}
+                                      />
+                                      <Flex my={"10px"}>
+                                        <Button
+                                          size={"sm"}
+                                          colorScheme={"blue"}
+                                          onClick={() => {
+                                            onClose();
+                                            changeCard();
+                                          }}
+                                        >
+                                          Save
+                                        </Button>
+                                        <Button
+                                          ml={1}
+                                          size={"sm"}
+                                          onClick={() => {
+                                            setIsAddingCardContent(false);
+                                            setCardContent(currentCardContent);
+                                          }}
+                                        >
+                                          <FontAwesomeIcon icon={faX} />
+                                        </Button>
+                                      </Flex>
+                                    </Box>
+                                  )}
+                                </Box>
+                              </Flex>
+                            </ModalBody>
+                          </ModalContent>
+                        </Modal>
+                        {isAddingCard && addingCardIdx === idx && (
+                          <Box>
+                            <Input
+                              w={"90%"}
+                              m={"0px 5%"}
+                              bg={"rgba(0,0,0,0.32)"}
+                              placeholder={"Input a title"}
+                              onChange={(e) => setCardTitle(e.target.value)}
+                            />
+                            <Flex my={"10px"}>
+                              <Button
+                                ml={"5%"}
+                                size={"sm"}
+                                colorScheme={"blue"}
+                                onClick={() => handleCardTitle(list.id)}
+                              >
+                                Add card
+                              </Button>
+                              <Button
+                                ml={1}
+                                size={"sm"}
+                                onClick={() => {
+                                  setIsAddingCard(false);
+                                  setAddingCardIdx(-1);
+                                  setCardTitle(null);
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faX} />
+                              </Button>
+                            </Flex>
+                          </Box>
+                        )}
+                        {addingCardIdx !== idx && (
+                          <Box
+                            w={"90%"}
+                            m={"10px auto"}
+                            color={"black"}
+                            textAlign={"center"}
+                            cursor={"pointer"}
+                            onClick={() => {
+                              setIsAddingCard(true);
+                              setAddingCardIdx(idx);
+                              setCardTitle(null);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faPlus} />{" "}
+                            <span style={{ marginLeft: "10px" }}>
+                              Add a card
+                            </span>
+                          </Box>
+                        )}
+                      </Box>
+                    </Center>
                   )}
-                  {addingCardIdx !== idx && (
-                    <Box
-                      w={"90%"}
-                      m={"10px auto"}
-                      color={"black"}
-                      textAlign={"center"}
-                      cursor={"pointer"}
-                      onClick={() => {
-                        setIsAddingCard(true);
-                        setAddingCardIdx(idx);
-                        setCardTitle(null);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faPlus} />{" "}
-                      <span style={{ marginLeft: "10px" }}>Add a card</span>
-                    </Box>
-                  )}
-                </Box>
-              </Center>
-            ))}
+                </Droppable>
+              ))}
+          </DragDropContext>
           {!isAddingList && (
             <Button
               w={"220px"}
