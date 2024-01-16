@@ -12,13 +12,15 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple, faCircle } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import KakaoLoginComp from "../../component/KakaoLoginComp";
+import GoogleLoginComp from "../../component/GoogleLoginComp";
+import NaverLoginComp from "../../component/NaverLoginComp";
 
 function LoginPage() {
-  const [email, setEmail] = useState(localStorage.getItem("oauthEmail"));
+  const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [checkPassword, setCheckPassword] = useState(null);
   const [attempt, setAttempt] = useState(0);
@@ -28,10 +30,14 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setEmail(localStorage.getItem("oauthEmail"));
+  }, []);
+
   const handleSubmit = () => {
     axios
       .post("/login", {
-        email,
+        email: email === null ? localStorage.getItem("oauthEmail") : email,
         password,
       })
       .then(({ data }) => {
@@ -65,7 +71,7 @@ function LoginPage() {
   const handleOauthSubmit = () => {
     axios
       .post("/api/v1/user/regist", {
-        email: email,
+        email: localStorage.getItem("oauthEmail"),
         nickname: localStorage.getItem("oauthNickname"),
         password: password,
         photo: localStorage.getItem("oauthPhoto"),
@@ -103,7 +109,7 @@ function LoginPage() {
       )}
       {localStorage.getItem("oauthEmail") && (
         <Box w={"100%"} h={"30px"} lineHeight={"30px"} textAlign={"center"}>
-          Input password to continue.
+          Input password for this site.
         </Box>
       )}
       {!localStorage.getItem("oauthEmail") && (
@@ -202,6 +208,8 @@ function LoginPage() {
         </Badge>
       )}
       {!localStorage.getItem("oauthEmail") && <KakaoLoginComp />}
+      {!localStorage.getItem("oauthEmail") && <GoogleLoginComp />}
+      {!localStorage.getItem("oauthEmail") && <NaverLoginComp />}
     </Box>
   );
 }
