@@ -13,12 +13,14 @@ import Board from "./page/workSapce/Board";
 import List from "./page/workSapce/List";
 import ManageAccount from "./page/workSapce/ManageAccount";
 import ChangePassword from "./page/welcome/ChangePassword";
+import KakaoLogin from "./page/welcome/KakaoLogin";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(
     <Route>
       <Route path="/" element={<WelcomePage />}>
         <Route index element={<Navbar />} />
+        <Route path="/kakaoLogin" element={<KakaoLogin />} />
       </Route>
       <Route path="login" element={<LoginPage />} />
       <Route path="signup" element={<SignUp />} />

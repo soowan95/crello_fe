@@ -2,20 +2,27 @@ import {
   Badge,
   Box,
   Button,
+  Divider,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Heading,
   Input,
   useToast,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartSimple, faCircle } from "@fortawesome/free-solid-svg-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import KakaoLoginComp from "../../component/KakaoLoginComp";
+import GoogleLoginComp from "../../component/GoogleLoginComp";
+import NaverLoginComp from "../../component/NaverLoginComp";
 
 function LoginPage() {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [checkPassword, setCheckPassword] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const [forgetPw, setForgetPw] = useState(false);
 
@@ -23,10 +30,14 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setEmail(localStorage.getItem("oauthEmail"));
+  }, []);
+
   const handleSubmit = () => {
     axios
       .post("/login", {
-        email,
+        email: email === null ? localStorage.getItem("oauthEmail") : email,
         password,
       })
       .then(({ data }) => {
@@ -57,6 +68,28 @@ function LoginPage() {
       });
   };
 
+  const handleOauthSubmit = () => {
+    axios
+      .post("/api/v1/user/regist", {
+        email: localStorage.getItem("oauthEmail"),
+        nickname: localStorage.getItem("oauthNickname"),
+        password: password,
+        photo: localStorage.getItem("oauthPhoto"),
+      })
+      .then(() => {
+        handleSubmit();
+        localStorage.removeItem("oauthNickname");
+        localStorage.removeItem("oauthPhoto");
+        localStorage.removeItem("oauthEmail");
+      })
+      .catch(() => {
+        toast({
+          description: "등록 중 문제가 발생했습니다.",
+          status: "warning",
+        });
+      });
+  };
+
   return (
     <Box w={"350px"} h={"700px"} m={"100px auto"}>
       <Heading
@@ -69,28 +102,68 @@ function LoginPage() {
       >
         <FontAwesomeIcon icon={faChartSimple} /> Crello
       </Heading>
-      <Box w={"100%"} h={"30px"} lineHeight={"30px"} textAlign={"center"}>
-        Sign in to continue.
-      </Box>
-      <Input
-        mt={"30px"}
-        placeholder={"Email"}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <Input
-        mt={"10px"}
-        type={"password"}
-        placeholder={"Password"}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Button
-        mt={"10px"}
-        w={"100%"}
-        isDisabled={!email || !password}
-        onClick={handleSubmit}
-      >
-        Continue
-      </Button>
+      {!localStorage.getItem("oauthEmail") && (
+        <Box w={"100%"} h={"30px"} lineHeight={"30px"} textAlign={"center"}>
+          Sign in to continue.
+        </Box>
+      )}
+      {localStorage.getItem("oauthEmail") && (
+        <Box w={"100%"} h={"30px"} lineHeight={"30px"} textAlign={"center"}>
+          Input password for this site.
+        </Box>
+      )}
+      {!localStorage.getItem("oauthEmail") && (
+        <Input
+          mt={"30px"}
+          placeholder={"Email"}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      )}
+      {!localStorage.getItem("oauthEmail") && (
+        <Input
+          mt={"10px"}
+          type={"password"}
+          placeholder={"Password"}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      )}
+      {localStorage.getItem("oauthEmail") && (
+        <FormControl isInvalid={password !== checkPassword}>
+          <Input
+            mt={"15px"}
+            type={"password"}
+            placeholder={"Password"}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Input
+            mt={"15px"}
+            type={"password"}
+            placeholder={"CheckPassword"}
+            onChange={(e) => setCheckPassword(e.target.value)}
+          />
+          <FormErrorMessage>Check your password.</FormErrorMessage>
+        </FormControl>
+      )}
+      {!localStorage.getItem("oauthEmail") && (
+        <Button
+          mt={"10px"}
+          w={"100%"}
+          isDisabled={!email || !password}
+          onClick={handleSubmit}
+        >
+          Continue
+        </Button>
+      )}
+      {localStorage.getItem("oauthEmail") && (
+        <Button
+          mt={"10px"}
+          w={"100%"}
+          isDisabled={!password || password !== checkPassword}
+          onClick={handleOauthSubmit}
+        >
+          Continue
+        </Button>
+      )}
       {forgetPw && (
         <Flex
           mt={"20px"}
@@ -128,6 +201,15 @@ function LoginPage() {
           create account
         </Badge>
       </Flex>
+      {!localStorage.getItem("oauthEmail") && <Divider />}
+      {!localStorage.getItem("oauthEmail") && (
+        <Badge ml={"60px"} mt={"10px"} bg={"none"}>
+          Or continue using something else
+        </Badge>
+      )}
+      {!localStorage.getItem("oauthEmail") && <KakaoLoginComp />}
+      {!localStorage.getItem("oauthEmail") && <GoogleLoginComp />}
+      {!localStorage.getItem("oauthEmail") && <NaverLoginComp />}
     </Box>
   );
 }
