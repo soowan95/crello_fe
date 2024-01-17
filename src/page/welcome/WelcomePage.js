@@ -21,6 +21,7 @@ import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
+import PurchasePage from "./PurchasePage";
 
 function WelcomePage() {
   const [firstEmail, setFirstEmail] = useState(null);
@@ -61,6 +62,7 @@ function WelcomePage() {
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
             localStorage.setItem("photo", data.photo);
+            localStorage.setItem("role", data.role);
             navigate("/u/board");
           });
       })
@@ -118,7 +120,7 @@ function WelcomePage() {
       <Flex
         mt={"10px"}
         w={"100%"}
-        h={"700px"}
+        h={"600px"}
         justifyContent={"center"}
         gap={"50px"}
       >
@@ -266,6 +268,7 @@ function WelcomePage() {
           />
         </Box>
       </Flex>
+      <PurchasePage />
     </Box>
   );
 }
