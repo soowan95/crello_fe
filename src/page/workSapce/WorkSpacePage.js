@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   Center,
@@ -9,12 +10,17 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Modal,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
   Popover,
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
   SimpleGrid,
   Tooltip,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -27,12 +33,16 @@ import Board from "./Board";
 import List from "./List";
 import { instance } from "../../modules/axios_interceptor";
 import ManageAccount from "./ManageAccount";
+import PaymentComp from "../../component/PaymentComp";
+import PurchasePage from "../welcome/PurchasePage";
 
 function WorkSpacePage() {
   const [boardTitle, setBoardTitle] = useState(null);
   const [boards, setBoards] = useState([]);
   const [recentBoard, setRecentBoard] = useState(null);
   const [color, setColor] = useState("#1d285d");
+
+  const { onOpen, isOpen, onClose } = useDisclosure();
 
   const navigate = useNavigate();
 
@@ -101,122 +111,141 @@ function WorkSpacePage() {
         >
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
-        {location.pathname === "/u/board" && (
-          <Popover placement={"bottom-start"}>
-            <PopoverTrigger>
-              <Button mr={"75%"} w={"8%"} size={"sm"}>
-                Create
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <Box m={"5px auto"}>Create board</Box>
-              <PopoverCloseButton />
-              <FormControl isInvalid={!boardTitle}>
-                <FormLabel fontSize={"0.8rem"} ml={4}>
-                  Board Color
-                </FormLabel>
-                <SimpleGrid
-                  w={"80%"}
-                  m={"10px auto"}
-                  columns={4}
-                  spacingX={10}
-                  spacingY={5}
-                >
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#1d285d"}
-                    onClick={() => setColor("#1d285d")}
-                    cursor={"pointer"}
+        {location.pathname === "/u/board" &&
+          ((localStorage.getItem("role") === "TRIAL" && boards.length < 3) ||
+            (localStorage.getItem("role") === "COMMON" && boards.length < 5) ||
+            localStorage.getItem("role") === "PREMIUM") && (
+            <Popover placement={"bottom-start"}>
+              <PopoverTrigger>
+                <Button mr={"75%"} w={"8%"} size={"sm"}>
+                  Create
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <Box m={"5px auto"}>Create board</Box>
+                <PopoverCloseButton />
+                <FormControl isInvalid={!boardTitle}>
+                  <FormLabel fontSize={"0.8rem"} ml={4}>
+                    Board Color
+                  </FormLabel>
+                  <SimpleGrid
+                    w={"80%"}
+                    m={"10px auto"}
+                    columns={4}
+                    spacingX={10}
+                    spacingY={5}
+                  >
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#1d285d"}
+                      onClick={() => setColor("#1d285d")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#621e1e"}
+                      onClick={() => setColor("#621e1e")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#e14d15"}
+                      onClick={() => setColor("#e14d15")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#e76060"}
+                      onClick={() => setColor("#e76060")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#542572"}
+                      onClick={() => setColor("#542572")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#386025"}
+                      onClick={() => setColor("#386025")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#45b0a8"}
+                      onClick={() => setColor("#45b0a8")}
+                      cursor={"pointer"}
+                    />
+                    <Box
+                      w={"30px"}
+                      h={"30px"}
+                      bg={"#c4b23c"}
+                      onClick={() => setColor("#c4b23c")}
+                      cursor={"pointer"}
+                    />
+                  </SimpleGrid>
+                  <Center
+                    w={"60%"}
+                    h={"150px"}
+                    m={"15px auto"}
+                    bg={color}
+                    borderRadius={"15px"}
+                  >
+                    <Box
+                      w={"85%"}
+                      h={"85%"}
+                      bg={"rgba(255,255,255,0.24)"}
+                      borderRadius={"10px"}
+                    />
+                  </Center>
+                  <Divider />
+                  <FormLabel fontSize={"0.8rem"} ml={4}>
+                    Board Title
+                  </FormLabel>
+                  <Input
+                    w={"90%"}
+                    ml={4}
+                    onChange={(e) => setBoardTitle(e.target.value)}
                   />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#621e1e"}
-                    onClick={() => setColor("#621e1e")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#e14d15"}
-                    onClick={() => setColor("#e14d15")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#e76060"}
-                    onClick={() => setColor("#e76060")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#542572"}
-                    onClick={() => setColor("#542572")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#386025"}
-                    onClick={() => setColor("#386025")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#45b0a8"}
-                    onClick={() => setColor("#45b0a8")}
-                    cursor={"pointer"}
-                  />
-                  <Box
-                    w={"30px"}
-                    h={"30px"}
-                    bg={"#c4b23c"}
-                    onClick={() => setColor("#c4b23c")}
-                    cursor={"pointer"}
-                  />
-                </SimpleGrid>
-                <Center
-                  w={"60%"}
-                  h={"150px"}
-                  m={"15px auto"}
-                  bg={color}
-                  borderRadius={"15px"}
-                >
-                  <Box
-                    w={"85%"}
-                    h={"85%"}
-                    bg={"rgba(255,255,255,0.24)"}
-                    borderRadius={"10px"}
-                  />
-                </Center>
-                <Divider />
-                <FormLabel fontSize={"0.8rem"} ml={4}>
-                  Board Title
-                </FormLabel>
-                <Input
+                  <FormErrorMessage ml={4}>
+                    * Board title is required
+                  </FormErrorMessage>
+                </FormControl>
+                <Button
                   w={"90%"}
-                  ml={4}
-                  onChange={(e) => setBoardTitle(e.target.value)}
-                />
-                <FormErrorMessage ml={4}>
-                  * Board title is required
-                </FormErrorMessage>
-              </FormControl>
-              <Button
-                w={"90%"}
-                m={"10px auto"}
-                isDisabled={!boardTitle}
-                onClick={handleCreate}
-              >
-                Create
-              </Button>
-            </PopoverContent>
-          </Popover>
-        )}
+                  m={"10px auto"}
+                  isDisabled={!boardTitle}
+                  onClick={handleCreate}
+                >
+                  Create
+                </Button>
+              </PopoverContent>
+            </Popover>
+          )}
+        {location.pathname === "/u/board" &&
+          ((localStorage.getItem("role") === "TRIAL" && boards.length === 3) ||
+            (localStorage.getItem("role") === "COMMON" &&
+              boards.length === 5)) && (
+            <Button mr={"75%"} w={"8%"} size={"sm"} onClick={onOpen}>
+              Purchase
+            </Button>
+          )}
+        <Modal isOpen={isOpen} onClose={onClose} size={"5xl"} isCentered={true}>
+          <ModalOverlay />
+          <ModalContent>
+            <Box onClick={onClose}>
+              <PurchasePage />
+            </Box>
+          </ModalContent>
+        </Modal>
         <Popover placement={"bottom-end"}>
           <PopoverTrigger>
             <Box>
@@ -231,9 +260,25 @@ function WorkSpacePage() {
           </PopoverTrigger>
           <PopoverContent w={"200px"}>
             <Box my={"10px"} ml={"20px"}>
-              <Box my={"5px"} fontSize={"0.8rem"} fontWeight={"bold"}>
-                Account
-              </Box>
+              <Flex alignItems={"center"}>
+                <Box my={"5px"} fontSize={"0.8rem"} fontWeight={"bold"}>
+                  Account
+                </Box>
+                <Badge
+                  bg={
+                    localStorage.getItem("role") === "TRIAL"
+                      ? "#3f2020"
+                      : localStorage.getItem("role") === "COMMON"
+                        ? "silver"
+                        : "#e5c569"
+                  }
+                  h={"15px"}
+                  ml={"5px"}
+                  fontSize={"0.7rem"}
+                >
+                  {localStorage.getItem("role")}
+                </Badge>
+              </Flex>
               <Box my={"5px"} ml={"10px"} fontSize={"0.8rem"}>
                 {localStorage.getItem("email")}
               </Box>

@@ -13,7 +13,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
-import { instance } from "../../modules/axios_interceptor";
 
 function ChangePassword() {
   const [email, setEmail] = useState(null);

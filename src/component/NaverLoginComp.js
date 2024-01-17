@@ -41,6 +41,7 @@ function NaverLoginComp() {
                   localStorage.setItem("nickname", data.nickname);
                   localStorage.setItem("email", data.email);
                   localStorage.setItem("photo", data.photo);
+                  localStorage.setItem("role", data.role);
                   navigate("/u/board");
                 });
             });

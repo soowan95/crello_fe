@@ -14,6 +14,7 @@ import List from "./page/workSapce/List";
 import ManageAccount from "./page/workSapce/ManageAccount";
 import ChangePassword from "./page/welcome/ChangePassword";
 import KakaoLogin from "./page/welcome/KakaoLogin";
+import PurchasePage from "./page/welcome/PurchasePage";
 
 const routes = createBrowserRouter(
   createRoutesFromElements(

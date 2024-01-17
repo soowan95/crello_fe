@@ -23,6 +23,7 @@ import React, { useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
+import PaymentComp from "../../component/PaymentComp";
 
 function SignUp() {
   const [firstEmail, setFirstEmail] = useState(null);
@@ -59,6 +60,7 @@ function SignUp() {
             localStorage.setItem("nickname", data.nickname);
             localStorage.setItem("email", data.email);
             localStorage.setItem("photo", data.photo);
+            localStorage.setItem("role", data.role);
             navigate("/u/board");
           });
       })
@@ -244,12 +246,22 @@ function SignUp() {
         {emailValidate && (
           <Button
             mt={"20px"}
-            onClick={handleSubmit}
+            onClick={() => {
+              handleSubmit();
+              if (localStorage.getItem("purchase"))
+                document.getElementById("payment").click();
+            }}
             isDisabled={!password || password !== checkPassword}
           >
             Sign-up
           </Button>
         )}
+        <Box display={"none"}>
+          <PaymentComp
+            amount={localStorage.getItem("amount")}
+            role={localStorage.getItem("purchase")}
+          />
+        </Box>
         <Flex mt={"20px"} w={"100%"} h={"30px"} justifyContent={"center"}>
           <Badge bg={"none"}>do you have accont ?</Badge>
           <Box mx={"3px"} h={"100%"} lineHeight={"20px"} fontSize={"0.2rem"}>
