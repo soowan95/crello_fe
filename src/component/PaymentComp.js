@@ -50,6 +50,8 @@ function PaymentComp({ amount, role }) {
                 })
                 .then(() => {
                   localStorage.setItem("role", role);
+                  localStorage.removeItem("purchase");
+                  localStorage.removeItem("amount");
                   window.location.reload();
                 });
             }

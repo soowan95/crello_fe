@@ -182,6 +182,7 @@ function LoginPage() {
             onClick={() => {
               navigate("/cpw");
               setForgetPw(false);
+              localStorage.setItem("ownEmail", email);
             }}
             cursor={"pointer"}
           >
