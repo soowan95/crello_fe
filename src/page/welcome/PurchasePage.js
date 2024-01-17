@@ -89,9 +89,10 @@ function PurchasePage() {
             Sign up now
           </Button>
         )}
-        {localStorage.getItem("email") && (
-          <PaymentComp amount={10000} role={"COMMON"} />
-        )}
+        {localStorage.getItem("email") &&
+          localStorage.getItem("role") !== "COMMON" && (
+            <PaymentComp amount={10000} role={"COMMON"} />
+          )}
       </Box>
       <Box
         w={"300px"}

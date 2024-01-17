@@ -112,9 +112,9 @@ function WorkSpacePage() {
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
         {location.pathname === "/u/board" &&
-          ((localStorage.getItem("role") === "Trial" && boards.length < 3) ||
-            (localStorage.getItem("role") === "Common" &&
-              boards.length < 5)) && (
+          ((localStorage.getItem("role") === "TRIAL" && boards.length < 3) ||
+            (localStorage.getItem("role") === "COMMON" && boards.length < 5) ||
+            localStorage.getItem("role") === "PREMIUM") && (
             <Popover placement={"bottom-start"}>
               <PopoverTrigger>
                 <Button mr={"75%"} w={"8%"} size={"sm"}>
@@ -231,8 +231,8 @@ function WorkSpacePage() {
             </Popover>
           )}
         {location.pathname === "/u/board" &&
-          ((localStorage.getItem("role") === "Trial" && boards.length === 3) ||
-            (localStorage.getItem("role") === "Common" &&
+          ((localStorage.getItem("role") === "TRIAL" && boards.length === 3) ||
+            (localStorage.getItem("role") === "COMMON" &&
               boards.length === 5)) && (
             <Button mr={"75%"} w={"8%"} size={"sm"} onClick={onOpen}>
               Purchase
@@ -266,9 +266,9 @@ function WorkSpacePage() {
                 </Box>
                 <Badge
                   bg={
-                    localStorage.getItem("role") === "Trial"
-                      ? "#4a5363"
-                      : localStorage.getItem("role") === "Common"
+                    localStorage.getItem("role") === "TRIAL"
+                      ? "#3f2020"
+                      : localStorage.getItem("role") === "COMMON"
                         ? "silver"
                         : "#e5c569"
                   }

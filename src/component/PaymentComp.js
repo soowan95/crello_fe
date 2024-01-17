@@ -42,20 +42,16 @@ function PaymentComp({ amount, role }) {
             "/api/v1/iamport/verify/" + res.imp_uid,
           );
           if (res.paid_amount === data.response.amount) {
-            toast({
-              description: "결제 성공",
-              status: "success",
-            });
             if (localStorage.getItem("email")) {
               instance
                 .put("/api/v1/user/roleUpdate", {
                   email: localStorage.getItem("email"),
                   role: role,
                 })
-                .then(() => localStorage.setItem("role", role));
-            } else {
-              navigate("/singup");
-              localStorage.setItem("role", role);
+                .then(() => {
+                  localStorage.setItem("role", role);
+                  window.location.reload();
+                });
             }
           } else if (data.response.failReason.indexOf("취소") !== 1) {
             toast({
@@ -80,7 +76,13 @@ function PaymentComp({ amount, role }) {
   };
 
   return (
-    <Button position={"absolute"} left={5} bottom={10} onClick={handlePayment}>
+    <Button
+      id={"payment"}
+      position={"absolute"}
+      left={5}
+      bottom={10}
+      onClick={handlePayment}
+    >
       Purchase
     </Button>
   );
