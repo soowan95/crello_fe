@@ -74,7 +74,10 @@ function ChangePassword() {
         email: email,
         password: password,
       })
-      .then(() => navigate("/login"))
+      .then(() => {
+        navigate("/login");
+        localStorage.removeItem("ownEmail");
+      })
       .catch((err) => {
         toast({
           description: err.response.data.msg,
@@ -99,17 +102,20 @@ function ChangePassword() {
         Change your password.
       </Box>
       {!emailValidate && !securityCode && (
-        <Input
-          mt={"30px"}
-          placeholder={"Email"}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <FormControl isInvalid={localStorage.getItem("ownEmail") !== email}>
+          <Input
+            mt={"30px"}
+            placeholder={"Email"}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <FormErrorMessage>Check is it your own email.</FormErrorMessage>
+        </FormControl>
       )}
       {!securityCode && (
         <Button
           mt={"10px"}
           w={"100%"}
-          isDisabled={!email}
+          isDisabled={!email || localStorage.getItem("ownEmail") !== email}
           onClick={handleSendSecurityCode}
         >
           Send securityCode
