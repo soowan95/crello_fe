@@ -87,6 +87,7 @@ function ManageAccount() {
         email: localStorage.getItem("email"),
         password: password,
         photo: photo === "" ? null : photo,
+        toBaseImg: photo === "" ? true : false,
       })
       .then(({ data }) => {
         localStorage.setItem("photo", data.photo);

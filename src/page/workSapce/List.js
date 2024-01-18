@@ -122,7 +122,7 @@ function List({ boards }) {
         localStorage.removeItem("boardId");
         localStorage.removeItem("boardTitle");
         localStorage.removeItem("boardColor");
-        navigate("/u/board");
+        navigate(`/u/board/${localStorage.getItem("code")}`);
       });
   };
 
@@ -317,8 +317,6 @@ function List({ boards }) {
                                 </Box>
                               </PopoverTrigger>
                               <PopoverContent
-                                color={"black"}
-                                bg={"#e8e8e8"}
                                 w={"200px"}
                                 boxShadow={"5px 4px 6px rgba(40, 40, 40, 0.7)"}
                               >
@@ -380,13 +378,7 @@ function List({ boards }) {
                                   </Box>
                                 )}
                                 {isMovingList && (
-                                  <Box
-                                    w={"90%"}
-                                    m={"10px 5%"}
-                                    cursor={"pointer"}
-                                    borderBottom={"1px solid white"}
-                                    borderRadius={"8px"}
-                                  >
+                                  <Box w={"90%"} m={"10px 5%"}>
                                     <Box
                                       ml={"10px"}
                                       mb={"10px"}
@@ -403,6 +395,7 @@ function List({ boards }) {
                                         );
                                         setMoveBoardId(e);
                                       }}
+                                      value={moveBoardId}
                                     >
                                       <Stack spacing={5}>
                                         {boards.length !== 0 &&
