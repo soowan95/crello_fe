@@ -1,49 +1,66 @@
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/free-regular-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { instance } from "../../modules/axios_interceptor";
 
 function Board({ boards, recentBoard }) {
   const navigate = useNavigate();
 
+  const params = useParams();
+
   const handleBoard = (id, title) => {
-    instance
-      .put("/api/v1/board/updateRecent", {
-        id,
-      })
-      .then(() => {
-        localStorage.setItem("boardId", id);
-        localStorage.setItem("boardTitle", title);
-        localStorage.setItem(
-          "boardColor",
-          boards.filter((b) => b.id - id === 0).at(0).color,
-        );
-        navigate("/u/list");
-      });
+    if (params.code === localStorage.getItem("code")) {
+      instance
+        .put("/api/v1/board/updateRecent", {
+          id,
+        })
+        .then(() => {
+          localStorage.setItem("boardId", id);
+          localStorage.setItem("boardTitle", title);
+          localStorage.setItem(
+            "boardColor",
+            boards.filter((b) => b.id - id === 0).at(0).color,
+          );
+          navigate(`/u/list/${localStorage.getItem("code")}`);
+        });
+    } else {
+      localStorage.setItem("boardId", id);
+      localStorage.setItem("boardTitle", title);
+      localStorage.setItem(
+        "boardColor",
+        boards.filter((b) => b.id - id === 0).at(0).color,
+      );
+      navigate(`/u/list/${params.code}`);
+    }
   };
 
   return (
     <Box>
       <Box w={"90%"} m={"80px auto"}>
-        <Box h={"50px"} fontSize={"1.5rem"}>
-          <FontAwesomeIcon icon={faClock} /> Recently worked
-        </Box>
-        {recentBoard !== null && recentBoard !== "" && (
-          <Box
-            mt={"20px"}
-            pl={3}
-            w={"230px"}
-            h={"200px"}
-            bg={recentBoard.color}
-            borderRadius={"10px"}
-            lineHeight={"40px"}
-            fontSize={"1.2rem"}
-            onClick={() => handleBoard(recentBoard.id, recentBoard.title)}
-          >
-            {recentBoard.title}
+        {params.code === localStorage.getItem("code") && (
+          <Box h={"50px"} fontSize={"1.5rem"}>
+            <FontAwesomeIcon icon={faClock} /> Recently worked
           </Box>
         )}
+        {params.code === localStorage.getItem("code") &&
+          recentBoard !== null &&
+          recentBoard !== "" && (
+            <Box
+              mt={"20px"}
+              pl={3}
+              w={"230px"}
+              h={"200px"}
+              bg={recentBoard.color}
+              borderRadius={"10px"}
+              lineHeight={"40px"}
+              fontSize={"1.2rem"}
+              cursor={"pointer"}
+              onClick={() => handleBoard(recentBoard.id, recentBoard.title)}
+            >
+              {recentBoard.title}
+            </Box>
+          )}
       </Box>
       <Box w={"90%"} m={"80px auto"}>
         <Heading h={"80px"}>Your Workspaces</Heading>
@@ -59,6 +76,7 @@ function Board({ boards, recentBoard }) {
                 borderRadius={"10px"}
                 lineHeight={"40px"}
                 fontSize={"1.2rem"}
+                cursor={"pointer"}
                 onClick={() => handleBoard(board.id, board.title)}
               >
                 {board.title}

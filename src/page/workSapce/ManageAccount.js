@@ -179,6 +179,7 @@ function ManageAccount() {
                 value={nickName}
                 borderRadius={"10px"}
                 onChange={(e) => {
+                  e = e.replace(" ", "");
                   setNickName(e);
                 }}
                 onSubmit={(e) => {

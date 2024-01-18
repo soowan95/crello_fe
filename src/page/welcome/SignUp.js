@@ -240,7 +240,10 @@ function SignUp() {
             placeholder={
               firstEmail ? "Nickname ( " + firstEmail + " )" : "Nickname"
             }
-            onChange={(e) => setNickname(e.target.value)}
+            onChange={(e) => {
+              e.target.value = e.target.value.replace(" ", "");
+              setNickname(e.target.value);
+            }}
           />
         )}
         {emailValidate && (

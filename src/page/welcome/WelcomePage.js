@@ -40,8 +40,9 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("accessToken")) navigate("/u/board");
-  }, [navigate]);
+    if (localStorage.getItem("accessToken"))
+      navigate(`/u/board/${localStorage.getItem("code")}`);
+  }, []);
 
   const handleSubmit = () => {
     axios
@@ -63,7 +64,7 @@ function WelcomePage() {
             localStorage.setItem("email", data.email);
             localStorage.setItem("photo", data.photo);
             localStorage.setItem("role", data.role);
-            navigate("/u/board");
+            navigate(`/u/board/${localStorage.getItem("code")}`);
           });
       })
       .catch((err) => {
@@ -248,7 +249,10 @@ function WelcomePage() {
               placeholder={
                 firstEmail ? "Nickname ( " + firstEmail + " )" : "Nickname"
               }
-              onChange={(e) => setNickname(e.target.value)}
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(" ", "");
+                setNickname(e.target.value);
+              }}
             />
           )}
           {emailValidate && (
