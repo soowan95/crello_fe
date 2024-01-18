@@ -17,7 +17,11 @@ import {
   PopoverCloseButton,
   PopoverContent,
   PopoverTrigger,
+  Portal,
+  Radio,
+  RadioGroup,
   SimpleGrid,
+  Stack,
   Tooltip,
   useDisclosure,
   useToast,
@@ -43,7 +47,9 @@ function WorkSpacePage() {
   const [recentBoard, setRecentBoard] = useState(null);
   const [color, setColor] = useState("#1d285d");
   const [searchAll, setSearchAll] = useState(null);
-  const [isFocus, setIsFocus] = useState(false);
+  const [isFocusInput, setIsFocusInput] = useState(false);
+  const [isFocusSearchResult, setIsFocusSearchResult] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
 
   const searchInput = useRef();
 
@@ -83,6 +89,7 @@ function WorkSpacePage() {
         title: boardTitle,
         email: localStorage.getItem("email"),
         color: color,
+        isPublic: isPublic,
       })
       .then(() => handleBoards());
   };
@@ -153,113 +160,130 @@ function WorkSpacePage() {
                   Create
                 </Button>
               </PopoverTrigger>
-              <PopoverContent>
-                <Box m={"5px auto"}>Create board</Box>
-                <PopoverCloseButton />
-                <FormControl isInvalid={!boardTitle}>
-                  <FormLabel fontSize={"0.8rem"} ml={4}>
-                    Board Color
-                  </FormLabel>
-                  <SimpleGrid
-                    w={"80%"}
-                    m={"10px auto"}
-                    columns={4}
-                    spacingX={10}
-                    spacingY={5}
-                  >
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#1d285d"}
-                      onClick={() => setColor("#1d285d")}
-                      cursor={"pointer"}
+              <Portal zIndex={2}>
+                <PopoverContent>
+                  <Box m={"5px auto"}>Create board</Box>
+                  <PopoverCloseButton />
+                  <FormControl isInvalid={!boardTitle}>
+                    <FormLabel fontSize={"0.8rem"} ml={4}>
+                      Board Color
+                    </FormLabel>
+                    <SimpleGrid
+                      w={"80%"}
+                      m={"10px auto"}
+                      columns={4}
+                      spacingX={10}
+                      spacingY={5}
+                    >
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#1d285d"}
+                        onClick={() => setColor("#1d285d")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#621e1e"}
+                        onClick={() => setColor("#621e1e")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#e14d15"}
+                        onClick={() => setColor("#e14d15")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#e76060"}
+                        onClick={() => setColor("#e76060")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#542572"}
+                        onClick={() => setColor("#542572")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#386025"}
+                        onClick={() => setColor("#386025")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#45b0a8"}
+                        onClick={() => setColor("#45b0a8")}
+                        cursor={"pointer"}
+                      />
+                      <Box
+                        w={"30px"}
+                        h={"30px"}
+                        bg={"#c4b23c"}
+                        onClick={() => setColor("#c4b23c")}
+                        cursor={"pointer"}
+                      />
+                    </SimpleGrid>
+                    <Center
+                      w={"60%"}
+                      h={"150px"}
+                      m={"15px auto"}
+                      bg={color}
+                      borderRadius={"15px"}
+                    >
+                      <Box
+                        w={"85%"}
+                        h={"85%"}
+                        bg={"rgba(255,255,255,0.24)"}
+                        borderRadius={"10px"}
+                      />
+                    </Center>
+                    <Divider />
+                    <FormLabel fontSize={"0.8rem"} ml={4}>
+                      Whether or not to the public.
+                    </FormLabel>
+                    <RadioGroup
+                      ml={4}
+                      mb={"10px"}
+                      onChange={setIsPublic}
+                      defaultValue={"true"}
+                    >
+                      <Stack direction="row">
+                        <Radio value="true">Public</Radio>
+                        <Radio value="false">Private</Radio>
+                      </Stack>
+                    </RadioGroup>
+                    <Divider />
+                    <FormLabel fontSize={"0.8rem"} ml={4}>
+                      Board Title
+                    </FormLabel>
+                    <Input
+                      w={"90%"}
+                      ml={4}
+                      onChange={(e) => setBoardTitle(e.target.value)}
                     />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#621e1e"}
-                      onClick={() => setColor("#621e1e")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#e14d15"}
-                      onClick={() => setColor("#e14d15")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#e76060"}
-                      onClick={() => setColor("#e76060")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#542572"}
-                      onClick={() => setColor("#542572")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#386025"}
-                      onClick={() => setColor("#386025")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#45b0a8"}
-                      onClick={() => setColor("#45b0a8")}
-                      cursor={"pointer"}
-                    />
-                    <Box
-                      w={"30px"}
-                      h={"30px"}
-                      bg={"#c4b23c"}
-                      onClick={() => setColor("#c4b23c")}
-                      cursor={"pointer"}
-                    />
-                  </SimpleGrid>
-                  <Center
-                    w={"60%"}
-                    h={"150px"}
-                    m={"15px auto"}
-                    bg={color}
-                    borderRadius={"15px"}
-                  >
-                    <Box
-                      w={"85%"}
-                      h={"85%"}
-                      bg={"rgba(255,255,255,0.24)"}
-                      borderRadius={"10px"}
-                    />
-                  </Center>
-                  <Divider />
-                  <FormLabel fontSize={"0.8rem"} ml={4}>
-                    Board Title
-                  </FormLabel>
-                  <Input
+                    <FormErrorMessage ml={4}>
+                      * Board title is required
+                    </FormErrorMessage>
+                  </FormControl>
+                  <Button
                     w={"90%"}
-                    ml={4}
-                    onChange={(e) => setBoardTitle(e.target.value)}
-                  />
-                  <FormErrorMessage ml={4}>
-                    * Board title is required
-                  </FormErrorMessage>
-                </FormControl>
-                <Button
-                  w={"90%"}
-                  m={"10px auto"}
-                  isDisabled={!boardTitle}
-                  onClick={handleCreate}
-                >
-                  Create
-                </Button>
-              </PopoverContent>
+                    m={"10px auto"}
+                    isDisabled={!boardTitle}
+                    onClick={handleCreate}
+                  >
+                    Create
+                  </Button>
+                </PopoverContent>
+              </Portal>
             </Popover>
           )}
         {location.pathname.includes("/u/board") &&
@@ -302,14 +326,14 @@ function WorkSpacePage() {
                   if (e.code === "Enter")
                     handleSearch(searchInput.current.value);
                 }}
-                onFocus={() => setIsFocus(true)}
-                onBlur={() => setIsFocus(false)}
+                onFocus={() => setIsFocusInput(true)}
+                onBlur={() => setIsFocusInput(false)}
               />
               <Button bg={"none"} size={"sm"}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </Button>
             </Flex>
-            {isFocus && (
+            {(isFocusInput || isFocusSearchResult) && (
               <Box
                 bg={"rgba(0,0,0,0.4)"}
                 border={"1px solid black"}
@@ -323,15 +347,18 @@ function WorkSpacePage() {
                         key={idx}
                         my={"5px"}
                         onClick={() => {
-                          setSearchAll(null);
                           handleSearch(search.split("#")[1]);
+                          setSearchAll(null);
                         }}
+                        onMouseEnter={() => setIsFocusSearchResult(true)}
+                        onMouseLeave={() => setIsFocusSearchResult(false)}
+                        cursor={"pointer"}
                       >
                         <Box mx={"20px"}>
                           <FontAwesomeIcon icon={faMagnifyingGlass} />
                         </Box>
                         <Box w={"300px"}>{search}</Box>
-                        <Box ml={"55%"}>
+                        <Box ml={"55%"} mr={"20px"}>
                           <FontAwesomeIcon icon={faLocationArrow} />
                         </Box>
                       </Flex>
