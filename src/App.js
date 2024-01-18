@@ -27,9 +27,9 @@ const routes = createBrowserRouter(
       <Route path="signup" element={<SignUp />} />
       <Route path="cpw" element={<ChangePassword />} />
       <Route path="u" element={<WorkSpacePage />}>
-        <Route path="board" element={<Board />} />
-        <Route path="list" element={<List />} />
-        <Route path="manage" element={<ManageAccount />} />
+        <Route path="board/:code" element={<Board />} />
+        <Route path="list/:code" element={<List />} />
+        <Route path="manage/:code" element={<ManageAccount />} />
       </Route>
     </Route>,
   ),

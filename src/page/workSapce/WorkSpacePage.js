@@ -11,7 +11,6 @@ import {
   FormLabel,
   Input,
   Modal,
-  ModalCloseButton,
   ModalContent,
   ModalOverlay,
   Popover,
@@ -21,19 +20,21 @@ import {
   SimpleGrid,
   Tooltip,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChartSimple,
+  faLocationArrow,
+  faMagnifyingGlass,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import Board from "./Board";
 import List from "./List";
 import { instance } from "../../modules/axios_interceptor";
 import ManageAccount from "./ManageAccount";
-import PaymentComp from "../../component/PaymentComp";
 import PurchasePage from "../welcome/PurchasePage";
 
 function WorkSpacePage() {
@@ -41,16 +42,24 @@ function WorkSpacePage() {
   const [boards, setBoards] = useState([]);
   const [recentBoard, setRecentBoard] = useState(null);
   const [color, setColor] = useState("#1d285d");
+  const [searchAll, setSearchAll] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const searchInput = useRef();
 
   const { onOpen, isOpen, onClose } = useDisclosure();
+
+  const toast = useToast();
 
   const navigate = useNavigate();
 
   const location = useLocation();
 
+  const params = useParams();
+
   useEffect(() => {
     if (!localStorage.getItem("accessToken")) navigate("/login");
-    else if (location.pathname === "/u/board") {
+    else if (location.pathname.includes("/u/board")) {
       handleBoards();
       handleRecentBoeard();
     }
@@ -64,7 +73,7 @@ function WorkSpacePage() {
 
   const handleBoards = () => {
     instance
-      .get("/api/v1/board/all?email=" + localStorage.getItem("email"))
+      .get(`/api/v1/board/all/${params.code}`)
       .then(({ data }) => setBoards(data));
   };
 
@@ -87,8 +96,30 @@ function WorkSpacePage() {
       });
   };
 
+  const handleSearch = (code) => {
+    instance
+      .get(`/api/v1/user/checkCode/${code}`)
+      .then(() => {
+        setSearchAll(null);
+        searchInput.current.value = null;
+        navigate(`/u/board/${code}`);
+      })
+      .catch((err) => {
+        toast({
+          description: err.response.data.msg,
+          status: "warning",
+        });
+      });
+  };
+
+  const handleSearchAll = (target) => {
+    instance
+      .get(`/api/v1/user/searchAll/${target}`)
+      .then(({ data }) => setSearchAll(data));
+  };
+
   return (
-    <Box position={"relative"} style={{ body: { backgroud: "pink" } }}>
+    <Box position={"relative"}>
       <Flex
         w={{ base: "100%", xl: "70%" }}
         h={"40px"}
@@ -107,11 +138,12 @@ function WorkSpacePage() {
           fontSize={"1.2rem"}
           textAlign={"center"}
           lineHeight={"40px"}
-          onClick={() => navigate("/u/board")}
+          onClick={() => navigate(`/u/board/${localStorage.getItem("code")}`)}
         >
           <FontAwesomeIcon icon={faChartSimple} /> Crello
         </Box>
-        {location.pathname === "/u/board" &&
+        {location.pathname.includes("/u/board") &&
+          params.code === localStorage.getItem("code") &&
           ((localStorage.getItem("role") === "TRIAL" && boards.length < 3) ||
             (localStorage.getItem("role") === "COMMON" && boards.length < 5) ||
             localStorage.getItem("role") === "PREMIUM") && (
@@ -230,7 +262,8 @@ function WorkSpacePage() {
               </PopoverContent>
             </Popover>
           )}
-        {location.pathname === "/u/board" &&
+        {location.pathname.includes("/u/board") &&
+          params.code === localStorage.getItem("code") &&
           ((localStorage.getItem("role") === "TRIAL" && boards.length === 3) ||
             (localStorage.getItem("role") === "COMMON" &&
               boards.length === 5)) && (
@@ -246,6 +279,67 @@ function WorkSpacePage() {
             </Box>
           </ModalContent>
         </Modal>
+        {location.pathname.includes("/u/board") && (
+          <Box w={"70%"} position={"absolute"} top={"2px"} left={"23%"}>
+            <Flex
+              w={"100%"}
+              border={"1px solid rgba(255, 255, 255, 0.3)"}
+              borderRadius={"10px"}
+              alignItems={"center"}
+            >
+              <Input
+                ref={searchInput}
+                border={"none"}
+                h={"25px"}
+                ml={"10px"}
+                onChange={(e) => {
+                  e.target.value = e.target.value.replace(" ", "");
+                  if (e.target.value && e.target.value !== "") {
+                    handleSearchAll(e.target.value);
+                  } else setSearchAll(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.code === "Enter")
+                    handleSearch(searchInput.current.value);
+                }}
+                onFocus={() => setIsFocus(true)}
+                onBlur={() => setIsFocus(false)}
+              />
+              <Button bg={"none"} size={"sm"}>
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
+              </Button>
+            </Flex>
+            {isFocus && (
+              <Box
+                bg={"rgba(0,0,0,0.4)"}
+                border={"1px solid black"}
+                borderRadius={"10px"}
+              >
+                {searchAll !== null &&
+                  searchAll
+                    .filter((item) => !item.includes(localStorage.code))
+                    .map((search, idx) => (
+                      <Flex
+                        key={idx}
+                        my={"5px"}
+                        onClick={() => {
+                          setSearchAll(null);
+                          handleSearch(search.split("#")[1]);
+                        }}
+                      >
+                        <Box mx={"20px"}>
+                          <FontAwesomeIcon icon={faMagnifyingGlass} />
+                        </Box>
+                        <Box w={"300px"}>{search}</Box>
+                        <Box ml={"55%"}>
+                          <FontAwesomeIcon icon={faLocationArrow} />
+                        </Box>
+                      </Flex>
+                    ))}
+              </Box>
+            )}
+          </Box>
+        )}
         <Popover placement={"bottom-end"}>
           <PopoverTrigger>
             <Box>
@@ -282,16 +376,19 @@ function WorkSpacePage() {
               <Box my={"5px"} ml={"10px"} fontSize={"0.8rem"}>
                 {localStorage.getItem("email")}
               </Box>
-              <Box my={"5px"} ml={"10px"}>
-                {localStorage.getItem("nickname")}
-              </Box>
+              <Flex my={"5px"} ml={"10px"} alignItems={"center"}>
+                <Box>{localStorage.getItem("nickname")}</Box>
+                <Badge h={"18px"}>#{localStorage.getItem("code")}</Badge>
+              </Flex>
               <Flex
                 cursor={"pointer"}
                 mt={"10px"}
                 alignItems={"center"}
                 justifyContent={"space-between"}
                 w={"90%"}
-                onClick={() => navigate("/u/manage")}
+                onClick={() =>
+                  navigate(`/u/manage/${localStorage.getItem("code")}`)
+                }
               >
                 <Box>Manage account</Box>
                 <Box>
@@ -311,11 +408,11 @@ function WorkSpacePage() {
           </PopoverContent>
         </Popover>
       </Flex>
-      {location.pathname === "/u/board" && (
+      {location.pathname.includes("/u/board") && (
         <Board boards={boards} recentBoard={recentBoard} />
       )}
-      {location.pathname === "/u/list" && <List boards={boards} />}
-      {location.pathname === "/u/manage" && <ManageAccount />}
+      {location.pathname.includes("/u/list") && <List boards={boards} />}
+      {location.pathname.includes("/u/manage") && <ManageAccount />}
     </Box>
   );
 }
