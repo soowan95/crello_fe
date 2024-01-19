@@ -12,16 +12,24 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Text,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
 import PurchasePage from "./PurchasePage";
+import { faGithub } from "@fortawesome/free-brands-svg-icons";
 
 function WelcomePage() {
   const [firstEmail, setFirstEmail] = useState(null);
@@ -130,7 +138,7 @@ function WelcomePage() {
             Crello brings all your tasks, teammates, and tools together
           </Heading>
           <Text mt={"20px"}>
-            Clone coding for trello.
+            Clone coding of trello.
             <Badge cursor={"pointer"} bg={"none"} color={"#9a9a9a"}>
               <Link to={"https://trello.com/home"}>go to Trello.</Link>
             </Badge>
@@ -273,6 +281,32 @@ function WelcomePage() {
         </Box>
       </Flex>
       <PurchasePage />
+      <Box mt={"30px"} w={"100%"} h={"100px"} bg={"black"}>
+        <Box pt={"20px"} pl={"80%"}>
+          <Flex gap={4}>
+            <Box>
+              <FontAwesomeIcon icon={faGithub} />
+            </Box>
+            <Box>Github</Box>
+          </Flex>
+          <Flex>
+            BE :
+            <Box ml={2}>
+              <Link to={"https://github.com/soowan95/crello_be"}>
+                https://github.com/soowan95/crello_be
+              </Link>
+            </Box>
+          </Flex>
+          <Flex>
+            FE :
+            <Box ml={2}>
+              <Link to={"https://github.com/soowan95/crello_fe"}>
+                https://github.com/soowan95/crello_fe
+              </Link>
+            </Box>
+          </Flex>
+        </Box>
+      </Box>
     </Box>
   );
 }
