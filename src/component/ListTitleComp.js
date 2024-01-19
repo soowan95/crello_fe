@@ -6,7 +6,6 @@ function ListTitleComp({ title, id }) {
   const [listTitle, setListTitle] = useState(title);
 
   const handleTitle = (title) => {
-    localStorage.setItem("boardTitle", title);
     instance.put("/api/v1/list/update", {
       title: title,
       id: id,
