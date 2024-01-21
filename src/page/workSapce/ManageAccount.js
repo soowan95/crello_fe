@@ -229,11 +229,18 @@ function ManageAccount() {
                     type="file"
                     className="file"
                     onChange={(e) => {
-                      freader.readAsDataURL(e.target.files[0]);
-                      freader.onload = (e) => {
-                        setPhotoPreview(e.target.result);
-                      };
-                      setPhoto(e.target.files[0]);
+                      if (e.target.files[0].size > 3 * 1024 * 1024) {
+                        toast({
+                          description: "파일 최대 용량을 초과했습니다.",
+                          status: "warning",
+                        });
+                      } else {
+                        freader.readAsDataURL(e.target.files[0]);
+                        freader.onload = (e) => {
+                          setPhotoPreview(e.target.result);
+                        };
+                        setPhoto(e.target.files[0]);
+                      }
                     }}
                   />
                   <Box className="preview_msg">
