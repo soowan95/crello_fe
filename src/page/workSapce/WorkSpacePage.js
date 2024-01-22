@@ -52,6 +52,7 @@ function WorkSpacePage() {
   const [isPublic, setIsPublic] = useState(true);
 
   const searchInput = useRef();
+  const boardTitleInput = useRef();
 
   const { onOpen, isOpen, onClose } = useDisclosure();
 
@@ -96,7 +97,7 @@ function WorkSpacePage() {
 
   const handleLogout = () => {
     instance
-      .post("/logout", { email: localStorage.getItem("email") })
+      .post("/api/v1/auth/logout", { email: localStorage.getItem("email") })
       .then(() => {
         localStorage.clear();
         navigate("/");
@@ -154,7 +155,13 @@ function WorkSpacePage() {
           ((localStorage.getItem("role") === "TRIAL" && boards.length < 3) ||
             (localStorage.getItem("role") === "COMMON" && boards.length < 5) ||
             localStorage.getItem("role") === "PREMIUM") && (
-            <Popover placement={"bottom-start"}>
+            <Popover
+              placement={"bottom-start"}
+              onClose={() => {
+                setBoardTitle(null);
+                boardTitleInput.current.value = null;
+              }}
+            >
               <PopoverTrigger>
                 <Button mr={"75%"} w={"8%"} size={"sm"}>
                   Create
@@ -266,6 +273,7 @@ function WorkSpacePage() {
                       Board Title
                     </FormLabel>
                     <Input
+                      ref={boardTitleInput}
                       w={"90%"}
                       ml={4}
                       onChange={(e) => setBoardTitle(e.target.value)}

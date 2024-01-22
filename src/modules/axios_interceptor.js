@@ -46,7 +46,7 @@ instance.interceptors.response.use(
         return axios(config);
       } catch (refreshError) {
         await axios.post(
-          "/logout",
+          "/api/v1/auth/logout",
           { email: localStorage.getItem("email") },
           {
             baseURL: baseURL,

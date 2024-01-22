@@ -36,7 +36,7 @@ function LoginPage() {
 
   const handleSubmit = () => {
     axios
-      .post("/login", {
+      .post("/api/v1/auth/login", {
         email: email === null ? localStorage.getItem("oauthEmail") : email,
         password,
       })
@@ -51,7 +51,7 @@ function LoginPage() {
         navigate(`/u/board/${data.code}`);
       })
       .catch((err) => {
-        if (err.response.status === 401) {
+        if (err.response.status === 400) {
           toast({
             description: err.response.data.msg,
             status: "error",
