@@ -40,7 +40,7 @@ function KakaoLogin() {
                 })
                 .catch(() => {
                   axios
-                    .post("/oauthLogin", {
+                    .post("/api/v1/auth/oauthLogin", {
                       email: data.kakao_account.email,
                     })
                     .then(({ data }) => {

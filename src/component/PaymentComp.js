@@ -2,12 +2,9 @@ import { Button, useToast } from "@chakra-ui/react";
 import { useEffect } from "react";
 import axios from "axios";
 import { instance } from "../modules/axios_interceptor";
-import { useNavigate } from "react-router-dom";
 
 function PaymentComp({ amount, role }) {
   const toast = useToast();
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const jquery = document.createElement("script");

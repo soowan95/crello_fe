@@ -61,7 +61,8 @@ function SignUp() {
             localStorage.setItem("email", data.email);
             localStorage.setItem("photo", data.photo);
             localStorage.setItem("role", data.role);
-            navigate("/u/board");
+            localStorage.setItem("code", data.code);
+            navigate(`/u/board/${data.code}`);
           });
       })
       .catch((err) => {

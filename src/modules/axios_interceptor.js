@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://localhost:8080";
+const baseURL = "http://43.200.39.112:8081";
 
 export const instance = axios.create({
   baseURL: baseURL,
@@ -46,7 +46,7 @@ instance.interceptors.response.use(
         return axios(config);
       } catch (refreshError) {
         await axios.post(
-          "/logout",
+          "/api/v1/auth/logout",
           { email: localStorage.getItem("email") },
           {
             baseURL: baseURL,
