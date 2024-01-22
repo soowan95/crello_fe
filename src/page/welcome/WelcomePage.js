@@ -54,7 +54,7 @@ function WelcomePage() {
       })
       .then(() => {
         axios
-          .post("/login", {
+          .post("/api/v1/auth/login", {
             email: firstEmail + "@" + secondEmail,
             password,
           })
