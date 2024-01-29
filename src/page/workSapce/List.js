@@ -32,7 +32,6 @@ import {
   faPen,
   faPlus,
   faTrash,
-  faTrashCan,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -730,103 +729,109 @@ function List({ boards }) {
           )}
           {params.code !== localStorage.getItem("code") &&
             lists.length !== 0 &&
-            lists.map((list, idx) => (
-              <Center
-                w={"220px"}
-                h={"fit-content"}
-                bg={localStorage.getItem("boardColor")}
-                borderRadius={"15px"}
-                key={idx}
-              >
-                <Box
-                  w={"90%"}
-                  bg={"rgba(255,255,255,0.24)"}
-                  my={"10px"}
-                  borderRadius={"10px"}
+            lists
+              .filter((list) => list.cards)
+              .map((list, idx) => (
+                <Center
+                  w={"220px"}
+                  h={"fit-content"}
+                  bg={localStorage.getItem("boardColor")}
+                  borderRadius={"15px"}
+                  key={idx}
                 >
-                  <Flex
-                    h={"40px"}
+                  <Box
                     w={"90%"}
-                    m={"5px auto"}
-                    justifyContent={"space-between"}
+                    bg={"rgba(255,255,255,0.24)"}
+                    my={"10px"}
+                    borderRadius={"10px"}
                   >
-                    <Box w={"fit-content"} h={"30px"} mt={"5px"}>
-                      {list.title}
-                    </Box>
-                  </Flex>
-                  {list.cards.length !== 0 &&
-                    list.cards.map((card) => (
-                      <Box
-                        key={card.id}
-                        w={"90%"}
-                        h={"fit-content"}
-                        lineHeight={"40px"}
-                        m={"10px auto"}
-                        bg={"rgba(0,0,0,0.32)"}
-                        pl={5}
-                        borderRadius={"10px"}
-                        position={"relative"}
-                        cursor={"pointer"}
-                        _hover={{ border: "1px solid #49ca94" }}
-                        onClick={() => {
-                          onOpen();
-                          setCardTitle(card.title);
-                          setCardId(card.id);
-                          setCardContent(card.content);
-                        }}
-                      >
-                        {card.title}{" "}
-                        {card.content !== null && (
-                          <div style={{ marginTop: "-10px" }}>
-                            <FontAwesomeIcon icon={faAlignLeft} />
-                          </div>
-                        )}
+                    <Flex
+                      h={"40px"}
+                      w={"90%"}
+                      m={"5px auto"}
+                      justifyContent={"space-between"}
+                    >
+                      <Box w={"fit-content"} h={"30px"} mt={"5px"}>
+                        {list.title}
                       </Box>
-                    ))}
-                  <Modal
-                    isOpen={isOpen}
-                    onClose={() => {
-                      onClose();
-                      setCardTitle(null);
-                      setCardId(null);
-                      setCardContent(null);
-                    }}
-                    size={"xl"}
-                    isCentered={true}
-                  >
-                    <ModalContent>
-                      <ModalHeader>
-                        <Flex>
-                          <Box>
-                            <FontAwesomeIcon icon={faHardDrive} />
-                          </Box>
-                          <Box w={"fit-content"} h={"30px"} ml={5} mt={"5px"}>
-                            {cardTitle}
-                          </Box>
-                        </Flex>
-                      </ModalHeader>
-                      <ModalBody>
-                        <Flex>
-                          <Box>
-                            <FontAwesomeIcon icon={faAlignLeft} />
-                          </Box>
-                          <Box ml={"25px"}>
-                            <Box mb={"20px"}>Description</Box>
-                            <Box my={"10px"} w={"500px"} position={"relative"}>
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: cardContent,
-                                }}
-                              />
+                    </Flex>
+                    {list.cards.length !== 0 &&
+                      list.cards.map((card) => (
+                        <Box
+                          key={card.id}
+                          w={"90%"}
+                          h={"fit-content"}
+                          lineHeight={"40px"}
+                          m={"10px auto"}
+                          bg={"rgba(0,0,0,0.32)"}
+                          pl={5}
+                          borderRadius={"10px"}
+                          position={"relative"}
+                          cursor={"pointer"}
+                          _hover={{ border: "1px solid #49ca94" }}
+                          onClick={() => {
+                            onOpen();
+                            setCardTitle(card.title);
+                            setCardId(card.id);
+                            setCardContent(card.content);
+                          }}
+                        >
+                          {card.title}{" "}
+                          {card.content !== null && (
+                            <div style={{ marginTop: "-10px" }}>
+                              <FontAwesomeIcon icon={faAlignLeft} />
+                            </div>
+                          )}
+                        </Box>
+                      ))}
+                    <Modal
+                      isOpen={isOpen}
+                      onClose={() => {
+                        onClose();
+                        setCardTitle(null);
+                        setCardId(null);
+                        setCardContent(null);
+                      }}
+                      size={"xl"}
+                      isCentered={true}
+                    >
+                      <ModalContent>
+                        <ModalHeader>
+                          <Flex>
+                            <Box>
+                              <FontAwesomeIcon icon={faHardDrive} />
                             </Box>
-                          </Box>
-                        </Flex>
-                      </ModalBody>
-                    </ModalContent>
-                  </Modal>
-                </Box>
-              </Center>
-            ))}
+                            <Box w={"fit-content"} h={"30px"} ml={5} mt={"5px"}>
+                              {cardTitle}
+                            </Box>
+                          </Flex>
+                        </ModalHeader>
+                        <ModalBody>
+                          <Flex>
+                            <Box>
+                              <FontAwesomeIcon icon={faAlignLeft} />
+                            </Box>
+                            <Box ml={"25px"}>
+                              <Box mb={"20px"}>Description</Box>
+                              <Box
+                                my={"10px"}
+                                w={"500px"}
+                                position={"relative"}
+                              >
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: cardContent,
+                                  }}
+                                />
+                              </Box>
+                            </Box>
+                          </Flex>
+                        </ModalBody>
+                      </ModalContent>
+                    </Modal>
+                  </Box>
+                </Center>
+              ))}
           {params.code === localStorage.getItem("code") && !isAddingList && (
             <Button
               w={"220px"}
